@@ -95,8 +95,8 @@ jobs:
       - name: Generate localizations
         run: flutter gen-l10n
 
-      - name: Build iOS (no codesign)
-        run: flutter build ios --release --no-codesign
+      - name: Build iOS (simulator, no codesign)
+        run: flutter build ios --release --simulator --no-codesign
 
       - name: Upload iOS build
         uses: actions/upload-artifact@v4
