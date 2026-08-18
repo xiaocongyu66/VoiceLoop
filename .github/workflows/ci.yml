@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
@@ -32,15 +32,12 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-        working-directory: tts
 
       - name: Analyze
         run: dart analyze lib/
-        working-directory: tts
 
       - name: Check format
         run: dart format --set-exit-if-changed lib/
-        working-directory: tts
 
   build-android:
     name: Build Android APK
@@ -49,7 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
@@ -62,17 +59,15 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-        working-directory: tts
 
       - name: Build APK
         run: flutter build apk --release --target-platform android-arm64,android-arm,android-x64
-        working-directory: tts
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: voiceloop-android-apk
-          path: tts/build/app/outputs/flutter-apk/*.apk
+          path: build/app/outputs/flutter-apk/*.apk
           retention-days: 30
 
   build-ios:
@@ -90,17 +85,15 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-        working-directory: tts
 
       - name: Build iOS (no codesign)
         run: flutter build ios --release --no-codesign
-        working-directory: tts
 
       - name: Upload iOS build
         uses: actions/upload-artifact@v4
         with:
           name: voiceloop-ios-build
-          path: tts/build/ios/iphoneos/Runner.app
+          path: build/ios/iphoneos/Runner.app
           retention-days: 30
 
   release:
