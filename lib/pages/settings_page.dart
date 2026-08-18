@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../core/constants/languages.dart';
 import '../core/extensions/context_extensions.dart';
+import '../l10n/app_localizations.dart';
 import '../models/app_settings.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/language_selector.dart';
@@ -13,12 +14,13 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLoc.of(context)!;
     final settings = ref.watch(settingsProvider);
     final notifier = ref.read(settingsProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('设置'),
+        title: Text(l.settings),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => context.go('/'),
@@ -28,7 +30,7 @@ class SettingsPage extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
           _SettingsSection(
-            title: '语言设置',
+            title: l.languageSettings,
             icon: Icons.language_rounded,
             children: [
               LanguageSelector(
@@ -36,7 +38,7 @@ class SettingsPage extends ConsumerWidget {
                 onChanged: (lang) {
                   if (lang != null) notifier.updateSourceLang(lang.code.name);
                 },
-                label: '源语言',
+                label: l.sourceLanguage,
               ),
               const SizedBox(height: 12),
               LanguageSelector(
@@ -44,17 +46,17 @@ class SettingsPage extends ConsumerWidget {
                 onChanged: (lang) {
                   if (lang != null) notifier.updateTargetLang(lang.code.name);
                 },
-                label: '目标语言',
+                label: l.targetLanguage,
               ),
             ],
           ),
           const SizedBox(height: 16),
           _SettingsSection(
-            title: '模型设置',
+            title: l.modelSettings,
             icon: Icons.model_training_rounded,
             children: [
               _DropdownTile<String>(
-                label: 'ASR 模型',
+                label: l.asrModel,
                 value: settings.asrModelId,
                 items: const [
                   DropdownMenuItem(value: 'sensevoice-small', child: Text('SenseVoice Small')),
@@ -68,7 +70,7 @@ class SettingsPage extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               _DropdownTile<String>(
-                label: 'TTS 模型',
+                label: l.ttsModel,
                 value: settings.ttsModelId ?? '',
                 items: const [
                   DropdownMenuItem(value: 'edge-tts', child: Text('Edge TTS')),
@@ -85,11 +87,11 @@ class SettingsPage extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           _SettingsSection(
-            title: '翻译引擎',
+            title: l.translationEngine,
             icon: Icons.translate_rounded,
             children: [
               _DropdownTile<TranslationEngine>(
-                label: '翻译引擎',
+                label: l.translationEngineLabel,
                 value: settings.translationEngine,
                 items: const [
                   DropdownMenuItem(value: TranslationEngine.mlKit, child: Text('ML Kit')),
@@ -104,24 +106,24 @@ class SettingsPage extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           _SettingsSection(
-            title: '行为设置',
+            title: l.behaviorSettings,
             icon: Icons.tune_rounded,
             children: [
               SwitchListTile(
-                title: const Text('自动翻译'),
-                subtitle: const Text('识别完成后自动翻译'),
+                title: Text(l.autoTranslate),
+                subtitle: Text(l.autoTranslateHint),
                 value: settings.autoTranslate,
                 onChanged: (v) => notifier.toggleAutoTranslate(),
               ),
               SwitchListTile(
-                title: const Text('自动朗读'),
-                subtitle: const Text('翻译完成后自动播放语音'),
+                title: Text(l.autoSpeak),
+                subtitle: Text(l.autoSpeakHint),
                 value: settings.autoSpeak,
                 onChanged: (v) => notifier.toggleAutoSpeak(),
               ),
               SwitchListTile(
-                title: const Text('面对面模式'),
-                subtitle: const Text('启用上下翻转的面对面翻译界面'),
+                title: Text(l.mirrorMode),
+                subtitle: Text(l.mirrorModeHint),
                 value: settings.mirrorMode,
                 onChanged: (v) => notifier.toggleMirrorMode(),
               ),

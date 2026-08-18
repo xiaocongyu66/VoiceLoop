@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/constants/languages.dart';
 import '../core/extensions/context_extensions.dart';
+import '../l10n/app_localizations.dart';
 import '../models/translation_result.dart';
 
 class TranslationCard extends StatelessWidget {
@@ -16,6 +17,7 @@ class TranslationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLoc.of(context)!;
     final theme = context.theme;
     final hasResult = result != null;
     final hasPartial = partialText != null && partialText!.isNotEmpty;
@@ -39,6 +41,14 @@ class TranslationCard extends StatelessWidget {
                 label: sourceLang?.nativeName ?? result!.sourceLanguage,
               ),
               const SizedBox(height: 8),
+              Text(
+                l.originalText,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.outline,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
               Text(
                 result!.originalText,
                 style: theme.textTheme.bodyLarge?.copyWith(
@@ -65,6 +75,14 @@ class TranslationCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
+                l.translatedText,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.outline,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
                 result!.translatedText,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
@@ -84,7 +102,7 @@ class TranslationCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '识别中...',
+                    l.recognizing,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.outline,
                     ),
@@ -110,7 +128,7 @@ class TranslationCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      '点击下方按钮开始录音',
+                      l.tapToStart,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.outline,
                       ),

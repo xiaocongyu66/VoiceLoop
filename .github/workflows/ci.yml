@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  FLUTTER_VERSION: '3.27.4'
+  FLUTTER_VERSION: '3.22.3'
   JAVA_VERSION: '17'
 
 jobs:
@@ -32,6 +32,9 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Generate localizations
+        run: flutter gen-l10n
 
       - name: Analyze
         run: dart analyze lib/
@@ -60,6 +63,9 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Generate localizations
+        run: flutter gen-l10n
+
       - name: Build APK
         run: flutter build apk --release --target-platform android-arm64,android-arm,android-x64
 
@@ -85,6 +91,9 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Generate localizations
+        run: flutter gen-l10n
 
       - name: Build iOS (no codesign)
         run: flutter build ios --release --no-codesign

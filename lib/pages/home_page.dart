@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/constants/languages.dart';
+import '../l10n/app_localizations.dart';
 import '../providers/pipeline_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/language_selector.dart';
@@ -16,6 +17,7 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLoc.of(context)!;
     final settings = ref.watch(settingsProvider);
     final pipelineState = ref.watch(pipelineStateProvider);
     final partialText = ref.watch(partialTextProvider);
@@ -28,7 +30,7 @@ class HomePage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('VoiceLoop'),
+        title: Text(l.appTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.history_rounded),
@@ -131,13 +133,14 @@ class _LanguageBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLoc.of(context)!;
     return Row(
       children: [
         Expanded(
           child: LanguageSelector(
             value: sourceLang,
             onChanged: onSourceChanged,
-            label: '源语言',
+            label: l.sourceLanguage,
           ),
         ),
         Padding(
@@ -154,7 +157,7 @@ class _LanguageBar extends StatelessWidget {
           child: LanguageSelector(
             value: targetLang,
             onChanged: onTargetChanged,
-            label: '目标语言',
+            label: l.targetLanguage,
           ),
         ),
       ],

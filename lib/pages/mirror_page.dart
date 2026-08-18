@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/constants/languages.dart';
 import '../core/extensions/context_extensions.dart';
+
 import '../providers/pipeline_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/record_button.dart' as rb;

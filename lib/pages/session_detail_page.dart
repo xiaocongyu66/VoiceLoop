@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../l10n/app_localizations.dart';
 import '../providers/session_provider.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/message_bubble.dart';
@@ -16,22 +17,23 @@ class SessionDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLoc.of(context)!;
     final sessions = ref.watch(sessionProvider);
     final session = sessions.where((s) => s.id == sessionId).firstOrNull;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(session?.title ?? '会话详情'),
+        title: Text(session?.title ?? l.sessionDetail),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => context.go('/history'),
         ),
       ),
       body: session == null || session.messages.isEmpty
-          ? const EmptyState(
+          ? EmptyState(
               icon: Icons.chat_bubble_outline_rounded,
-              title: '暂无消息',
-              subtitle: '此会话中还没有翻译消息',
+              title: l.sessionEmpty,
+              subtitle: l.sessionEmptyHint,
             )
           : ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
