@@ -89,7 +89,7 @@ class _RecordButtonState extends State<RecordButton>
                   height: size + 32,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: color.withValues(alpha: 0.15),
+                    color: color.withOpacity(0.15),
                   ),
                 ),
               ),
@@ -98,7 +98,7 @@ class _RecordButtonState extends State<RecordButton>
               height: size + 16,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: color.withValues(alpha: 0.2),
+                color: color.withOpacity(0.2),
               ),
             ),
           ],
@@ -112,11 +112,11 @@ class _RecordButtonState extends State<RecordButton>
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [color, color.withValues(alpha: 0.7)],
+                colors: [color, color.withOpacity(0.7)],
               ),
               boxShadow: [
                 BoxShadow(
-                  color: color.withValues(alpha: 0.4),
+                  color: color.withOpacity(0.4),
                   blurRadius: 20,
                   offset: const Offset(0, 6),
                 ),
@@ -210,7 +210,7 @@ class _WaveformIndicatorState extends State<_WaveformIndicator>
               width: 4,
               height: h,
               decoration: BoxDecoration(
-                color: widget.color.withValues(alpha: 0.8),
+                color: widget.color.withOpacity(0.8),
                 borderRadius: BorderRadius.circular(2),
               ),
             );

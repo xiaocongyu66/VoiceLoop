@@ -62,7 +62,7 @@ class TranslationCard extends StatelessWidget {
                   gradient: LinearGradient(
                     colors: [
                       Colors.transparent,
-                      theme.colorScheme.primary.withValues(alpha: 0.3),
+                      theme.colorScheme.primary.withOpacity(0.3),
                       Colors.transparent,
                     ],
                   ),
@@ -114,7 +114,7 @@ class TranslationCard extends StatelessWidget {
                 partialText!,
                 style: theme.textTheme.bodyLarge?.copyWith(
                   fontStyle: FontStyle.italic,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
             ] else ...[
