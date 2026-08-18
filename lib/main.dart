@@ -47,8 +47,9 @@ class _VoiceLoopAppState extends ConsumerState<VoiceLoopApp> {
       supportedLocales: AppLoc.supportedLocales,
       builder: (context, child) {
         if (!_initialized) {
-          return const MaterialApp(
-            home: Scaffold(body: Center(child: CircularProgressIndicator())),
+          return Material(
+            color: Theme.of(context).colorScheme.surface,
+            child: const Center(child: CircularProgressIndicator()),
           );
         }
         return child!;

@@ -19,7 +19,7 @@ class AudioPipeline {
   final AsrService asrService;
   final VadService vadService;
   final TtsService ttsService;
-  final AudioRecorderService _recorder = AudioRecorderService();
+  AudioRecorderService? _recorder;
 
   final StreamController<PipelineState> _stateController =
       StreamController<PipelineState>.broadcast();
@@ -68,8 +68,9 @@ class AudioPipeline {
 
     _setState(PipelineState.listening);
 
-    await _recorder.start();
-    _audioSub = _recorder.audioStream.listen((samples) {
+    _recorder ??= AudioRecorderService();
+    await _recorder!.start();
+    _audioSub = _recorder!.audioStream.listen((samples) {
       _processAudioChunk(samples, sourceLang, targetLang);
     });
   }
@@ -143,7 +144,7 @@ class AudioPipeline {
     _running = false;
     await _audioSub?.cancel();
     _audioSub = null;
-    await _recorder.stop();
+    await _recorder?.stop();
     _buffer.clear();
     _setState(PipelineState.idle);
   }
@@ -153,6 +154,6 @@ class AudioPipeline {
     await _stateController.close();
     await _partialTextController.close();
     await _translationController.close();
-    await _recorder.dispose();
+    await _recorder?.dispose();
   }
 }
