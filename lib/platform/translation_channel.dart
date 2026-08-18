@@ -3,8 +3,9 @@ import 'package:flutter/services.dart';
 import '../core/utils/logger.dart';
 
 class TranslationChannel {
-  static const MethodChannel _channel =
-      MethodChannel('com.voiceloop.translation');
+  static const MethodChannel _channel = MethodChannel(
+    'com.voiceloop.translation',
+  );
 
   Future<String> translate(
     String text,
@@ -45,8 +46,9 @@ class TranslationChannel {
 
   Future<List<String>> getSupportedLanguages() async {
     try {
-      final result =
-          await _channel.invokeMethod<List<dynamic>>('getSupportedLanguages');
+      final result = await _channel.invokeMethod<List<dynamic>>(
+        'getSupportedLanguages',
+      );
       if (result == null) {
         return const [];
       }

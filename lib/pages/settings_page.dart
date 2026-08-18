@@ -60,15 +60,21 @@ class SettingsPage extends ConsumerWidget {
                 value: settings.asrModelId,
                 items: const [
                   DropdownMenuItem(
-                      value: 'sensevoice-small',
-                      child: Text('SenseVoice Small')),
+                    value: 'sensevoice-small',
+                    child: Text('SenseVoice Small'),
+                  ),
                   DropdownMenuItem(
-                      value: 'sensevoice-large',
-                      child: Text('SenseVoice Large')),
+                    value: 'sensevoice-large',
+                    child: Text('SenseVoice Large'),
+                  ),
                   DropdownMenuItem(
-                      value: 'whisper-tiny', child: Text('Whisper Tiny')),
+                    value: 'whisper-tiny',
+                    child: Text('Whisper Tiny'),
+                  ),
                   DropdownMenuItem(
-                      value: 'whisper-base', child: Text('Whisper Base')),
+                    value: 'whisper-base',
+                    child: Text('Whisper Base'),
+                  ),
                 ],
                 onChanged: (v) {
                   if (v != null) notifier.updateAsrModel(v);
@@ -81,9 +87,13 @@ class SettingsPage extends ConsumerWidget {
                 items: const [
                   DropdownMenuItem(value: 'edge-tts', child: Text('Edge TTS')),
                   DropdownMenuItem(
-                      value: 'sherpa-onnx', child: Text('Sherpa-ONNX')),
+                    value: 'sherpa-onnx',
+                    child: Text('Sherpa-ONNX'),
+                  ),
                   DropdownMenuItem(
-                      value: 'flutter-tts', child: Text('Flutter TTS')),
+                    value: 'flutter-tts',
+                    child: Text('Flutter TTS'),
+                  ),
                 ],
                 onChanged: (v) {
                   if (v != null) {
@@ -103,13 +113,17 @@ class SettingsPage extends ConsumerWidget {
                 value: settings.translationEngine,
                 items: const [
                   DropdownMenuItem(
-                      value: TranslationEngine.mlKit, child: Text('ML Kit')),
+                    value: TranslationEngine.mlKit,
+                    child: Text('ML Kit'),
+                  ),
                   DropdownMenuItem(
-                      value: TranslationEngine.appleTranslation,
-                      child: Text('Apple Translation')),
+                    value: TranslationEngine.appleTranslation,
+                    child: Text('Apple Translation'),
+                  ),
                   DropdownMenuItem(
-                      value: TranslationEngine.systemTranslator,
-                      child: Text('System Translator')),
+                    value: TranslationEngine.systemTranslator,
+                    child: Text('System Translator'),
+                  ),
                 ],
                 onChanged: (v) {
                   if (v != null) notifier.updateTranslationEngine(v);
@@ -208,9 +222,7 @@ class _DropdownTile<T> extends StatelessWidget {
     return InputDecorator(
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       ),
       child: DropdownButtonHideUnderline(

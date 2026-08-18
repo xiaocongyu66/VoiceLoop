@@ -45,7 +45,9 @@ class HistoryPage extends ConsumerWidget {
                   child: Card(
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       title: Text(
                         session.title,
                         style: context.textTheme.titleMedium?.copyWith(
@@ -61,7 +63,8 @@ class HistoryPage extends ConsumerWidget {
                           Row(
                             children: [
                               Text(
-                                  '${sourceLang?.flag ?? '🌐'} → ${targetLang?.flag ?? '🌐'}'),
+                                '${sourceLang?.flag ?? '🌐'} → ${targetLang?.flag ?? '🌐'}',
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 '${session.messages.length} ${l.messages}',

@@ -9,11 +9,7 @@ class TranslationCard extends StatelessWidget {
   final TranslationResult? result;
   final String? partialText;
 
-  const TranslationCard({
-    super.key,
-    this.result,
-    this.partialText,
-  });
+  const TranslationCard({super.key, this.result, this.partialText});
 
   @override
   Widget build(BuildContext context) {
@@ -21,16 +17,16 @@ class TranslationCard extends StatelessWidget {
     final theme = context.theme;
     final hasResult = result != null;
     final hasPartial = partialText != null && partialText!.isNotEmpty;
-    final sourceLang =
-        hasResult ? AppLanguages.byCode(result!.sourceLanguage) : null;
-    final targetLang =
-        hasResult ? AppLanguages.byCode(result!.targetLanguage) : null;
+    final sourceLang = hasResult
+        ? AppLanguages.byCode(result!.sourceLanguage)
+        : null;
+    final targetLang = hasResult
+        ? AppLanguages.byCode(result!.targetLanguage)
+        : null;
 
     return Card(
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -99,8 +95,9 @@ class TranslationCard extends StatelessWidget {
                     height: 16,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor:
-                          AlwaysStoppedAnimation(theme.colorScheme.primary),
+                      valueColor: AlwaysStoppedAnimation(
+                        theme.colorScheme.primary,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -169,8 +166,8 @@ class _LangChip extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                ),
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
+            ),
           ),
         ],
       ),

@@ -9,16 +9,11 @@ import 'vad_service.dart';
 
 enum PipelineState { idle, listening, recognizing, translating, speaking }
 
-typedef TranslationCallback = Future<String> Function(
-  String text,
-  String sourceLang,
-  String targetLang,
-);
+typedef TranslationCallback =
+    Future<String> Function(String text, String sourceLang, String targetLang);
 
-typedef TtsCallback = Future<Float32List> Function(
-  String text,
-  String targetLang,
-);
+typedef TtsCallback =
+    Future<Float32List> Function(String text, String targetLang);
 
 class AudioPipeline {
   final AsrService asrService;
@@ -90,9 +85,7 @@ class AudioPipeline {
 
     const int chunkSize = 512;
     while (_buffer.length >= chunkSize) {
-      final chunk = Float32List.fromList(
-        _buffer.sublist(0, chunkSize),
-      );
+      final chunk = Float32List.fromList(_buffer.sublist(0, chunkSize));
       _buffer.removeRange(0, chunkSize);
 
       vadService.acceptWaveform(chunk);
@@ -100,11 +93,7 @@ class AudioPipeline {
       while (!vadService.isEmpty()) {
         final segment = vadService.front();
         if (segment.samples.isNotEmpty) {
-          _handleSpeechSegment(
-            segment.samples,
-            sourceLang,
-            targetLang,
-          );
+          _handleSpeechSegment(segment.samples, sourceLang, targetLang);
         }
         vadService.clear();
       }

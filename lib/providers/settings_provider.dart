@@ -38,7 +38,9 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       await prefs.setString('${_prefix}ttsModelId', state.ttsModelId!);
     }
     await prefs.setString(
-        '${_prefix}translationEngine', state.translationEngine.name);
+      '${_prefix}translationEngine',
+      state.translationEngine.name,
+    );
     await prefs.setBool('${_prefix}autoTranslate', state.autoTranslate);
     await prefs.setBool('${_prefix}autoSpeak', state.autoSpeak);
     await prefs.setBool('${_prefix}mirrorMode', state.mirrorMode);

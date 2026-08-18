@@ -33,9 +33,8 @@ class AppRouter {
       ),
       GoRoute(
         path: '/session/:id',
-        builder: (context, state) => SessionDetailPage(
-          sessionId: state.pathParameters['id']!,
-        ),
+        builder: (context, state) =>
+            SessionDetailPage(sessionId: state.pathParameters['id']!),
         routes: const <RouteBase>[],
       ),
     ],
@@ -46,11 +45,11 @@ class AppRouter {
 
 class SlideFadeTransition extends CustomTransitionPage<void> {
   const SlideFadeTransition({required super.child, super.key})
-      : super(
-          transitionsBuilder: _builder,
-          transitionDuration: const Duration(milliseconds: 300),
-          reverseTransitionDuration: const Duration(milliseconds: 300),
-        );
+    : super(
+        transitionsBuilder: _builder,
+        transitionDuration: const Duration(milliseconds: 300),
+        reverseTransitionDuration: const Duration(milliseconds: 300),
+      );
 
   static Widget _builder(
     BuildContext context,

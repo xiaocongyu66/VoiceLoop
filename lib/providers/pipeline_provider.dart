@@ -10,8 +10,9 @@ export '../services/audio_pipeline.dart' show PipelineState;
 
 final partialTextProvider = StateProvider<String>((ref) => '');
 
-final lastTranslationProvider =
-    StateProvider<TranslationResult?>((ref) => null);
+final lastTranslationProvider = StateProvider<TranslationResult?>(
+  (ref) => null,
+);
 
 class PipelineStateNotifier extends StateNotifier<PipelineState> {
   final Ref _ref;
@@ -60,5 +61,5 @@ class PipelineStateNotifier extends StateNotifier<PipelineState> {
 
 final pipelineStateProvider =
     StateNotifierProvider<PipelineStateNotifier, PipelineState>(
-  (ref) => PipelineStateNotifier(ref),
-);
+      (ref) => PipelineStateNotifier(ref),
+    );

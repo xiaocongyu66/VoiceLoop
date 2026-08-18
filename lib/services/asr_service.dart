@@ -7,11 +7,7 @@ class AsrService {
 
   bool get isInitialized => _recognizer != null;
 
-  void init(
-    String modelPath,
-    String tokensPath, {
-    String? language,
-  }) {
+  void init(String modelPath, String tokensPath, {String? language}) {
     final config = sherpa.OfflineRecognizerConfig(
       model: sherpa.OfflineModelConfig(
         tokens: tokensPath,

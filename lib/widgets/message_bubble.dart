@@ -12,13 +12,15 @@ class MessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.theme;
     final isOutgoing = message.direction == MessageDirection.outgoing;
-    final align =
-        isOutgoing ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    final align = isOutgoing
+        ? CrossAxisAlignment.end
+        : CrossAxisAlignment.start;
     final bubbleColor = isOutgoing
         ? theme.colorScheme.primary
         : theme.colorScheme.surfaceContainerHighest;
-    final textColor =
-        isOutgoing ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface;
+    final textColor = isOutgoing
+        ? theme.colorScheme.onPrimary
+        : theme.colorScheme.onSurface;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -26,19 +28,19 @@ class MessageBubble extends StatelessWidget {
         crossAxisAlignment: align,
         children: [
           Container(
-            constraints: BoxConstraints(
-              maxWidth: context.width * 0.78,
-            ),
+            constraints: BoxConstraints(maxWidth: context.width * 0.78),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: bubbleColor,
               borderRadius: BorderRadius.only(
                 topLeft: const Radius.circular(18),
                 topRight: const Radius.circular(18),
-                bottomLeft:
-                    isOutgoing ? const Radius.circular(18) : Radius.zero,
-                bottomRight:
-                    isOutgoing ? Radius.zero : const Radius.circular(18),
+                bottomLeft: isOutgoing
+                    ? const Radius.circular(18)
+                    : Radius.zero,
+                bottomRight: isOutgoing
+                    ? Radius.zero
+                    : const Radius.circular(18),
               ),
               boxShadow: [
                 BoxShadow(
@@ -60,10 +62,7 @@ class MessageBubble extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 6),
-                Container(
-                  height: 1,
-                  color: textColor.withOpacity(0.15),
-                ),
+                Container(height: 1, color: textColor.withOpacity(0.15)),
                 const SizedBox(height: 6),
                 Text(
                   message.translatedText,

@@ -10,10 +10,7 @@ import '../widgets/message_bubble.dart';
 class SessionDetailPage extends ConsumerWidget {
   final String sessionId;
 
-  const SessionDetailPage({
-    super.key,
-    required this.sessionId,
-  });
+  const SessionDetailPage({super.key, required this.sessionId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -10,11 +10,7 @@ class RecordButton extends StatefulWidget {
   final RecordButtonState state;
   final VoidCallback onPressed;
 
-  const RecordButton({
-    super.key,
-    required this.state,
-    required this.onPressed,
-  });
+  const RecordButton({super.key, required this.state, required this.onPressed});
 
   @override
   State<RecordButton> createState() => _RecordButtonState();
@@ -78,10 +74,7 @@ class _RecordButtonState extends State<RecordButton>
                   final opacity = 0.5 * (1.0 - t);
                   return Transform.scale(
                     scale: scale,
-                    child: Opacity(
-                      opacity: opacity,
-                      child: child,
-                    ),
+                    child: Opacity(opacity: opacity, child: child),
                   );
                 },
                 child: Container(
@@ -125,14 +118,14 @@ class _RecordButtonState extends State<RecordButton>
             child: widget.state == RecordButtonState.recording
                 ? _WaveformIndicator(color: Colors.white)
                 : widget.state == RecordButtonState.recognizing
-                    ? Padding(
-                        padding: const EdgeInsets.all(18),
-                        child: CircularProgressIndicator(
-                          strokeWidth: 3,
-                          valueColor: AlwaysStoppedAnimation(Colors.white),
-                        ),
-                      )
-                    : Icon(icon, color: Colors.white, size: 32),
+                ? Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      valueColor: AlwaysStoppedAnimation(Colors.white),
+                    ),
+                  )
+                : Icon(icon, color: Colors.white, size: 32),
           ),
         ],
       ),

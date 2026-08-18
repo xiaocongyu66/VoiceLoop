@@ -39,8 +39,8 @@ class SessionNotifier extends StateNotifier<List<TranslationSession>> {
 
 final sessionProvider =
     StateNotifierProvider<SessionNotifier, List<TranslationSession>>(
-  (ref) => SessionNotifier(),
-);
+      (ref) => SessionNotifier(),
+    );
 
 class CurrentSessionNotifier extends StateNotifier<TranslationSession?> {
   final Ref _ref;
@@ -76,5 +76,5 @@ class CurrentSessionNotifier extends StateNotifier<TranslationSession?> {
 
 final currentSessionProvider =
     StateNotifierProvider<CurrentSessionNotifier, TranslationSession?>(
-  (ref) => CurrentSessionNotifier(ref),
-);
+      (ref) => CurrentSessionNotifier(ref),
+    );

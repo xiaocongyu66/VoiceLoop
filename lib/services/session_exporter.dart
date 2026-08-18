@@ -55,7 +55,10 @@ class SessionExporter {
             final bytes = await entity.readAsBytes();
             archive.addFile(
               ArchiveFile(
-                  'audio/${p.basename(entity.path)}', bytes.length, bytes),
+                'audio/${p.basename(entity.path)}',
+                bytes.length,
+                bytes,
+              ),
             );
           }
         }

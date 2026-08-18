@@ -24,17 +24,22 @@ class LanguageSelector extends StatelessWidget {
             ? Padding(
                 padding: const EdgeInsets.only(left: 12, right: 8),
                 child: Center(
-                    child: Text(value!.flag,
-                        style: const TextStyle(fontSize: 22))),
+                  child: Text(
+                    value!.flag,
+                    style: const TextStyle(fontSize: 22),
+                  ),
+                ),
               )
             : null,
-        prefixIconConstraints:
-            const BoxConstraints(minWidth: 44, minHeight: 44),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+        prefixIconConstraints: const BoxConstraints(
+          minWidth: 44,
+          minHeight: 44,
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 10,
+        ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<LanguageInfo>(
@@ -55,10 +60,7 @@ class LanguageSelector extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          lang.name,
-                          style: context.textTheme.bodyLarge,
-                        ),
+                        Text(lang.name, style: context.textTheme.bodyLarge),
                         Text(
                           lang.nativeName,
                           style: context.textTheme.bodySmall?.copyWith(

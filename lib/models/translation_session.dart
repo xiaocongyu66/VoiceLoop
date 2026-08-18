@@ -19,32 +19,31 @@ class TranslationSession {
     required this.targetLang,
   });
 
-  factory TranslationSession.fromJson(Map<String, dynamic> json) =>
-      TranslationSession(
-        id: json['id'] as String,
-        title: json['title'] as String,
-        createdAt:
-            DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
-        updatedAt:
-            DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int),
-        messages: (json['messages'] as List?)
-                ?.map((e) =>
-                    TranslationMessage.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            const [],
-        sourceLang: json['sourceLang'] as String,
-        targetLang: json['targetLang'] as String,
-      );
+  factory TranslationSession.fromJson(
+    Map<String, dynamic> json,
+  ) => TranslationSession(
+    id: json['id'] as String,
+    title: json['title'] as String,
+    createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
+    updatedAt: DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int),
+    messages:
+        (json['messages'] as List?)
+            ?.map((e) => TranslationMessage.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        const [],
+    sourceLang: json['sourceLang'] as String,
+    targetLang: json['targetLang'] as String,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'createdAt': createdAt.millisecondsSinceEpoch,
-        'updatedAt': updatedAt.millisecondsSinceEpoch,
-        'messages': messages.map((m) => m.toJson()).toList(),
-        'sourceLang': sourceLang,
-        'targetLang': targetLang,
-      };
+    'id': id,
+    'title': title,
+    'createdAt': createdAt.millisecondsSinceEpoch,
+    'updatedAt': updatedAt.millisecondsSinceEpoch,
+    'messages': messages.map((m) => m.toJson()).toList(),
+    'sourceLang': sourceLang,
+    'targetLang': targetLang,
+  };
 
   @override
   bool operator ==(Object other) =>
