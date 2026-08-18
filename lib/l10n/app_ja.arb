@@ -40,10 +40,20 @@
   "swapLanguages": "言語を交換",
   "selectLanguage": "言語を選択",
   "recordPermissionDenied": "マイクの権限が必要です",
-  "modelNotDownloaded": "モデルがダウンロードされていません。設定でダウンロードしてください",
+  "modelNotDownloaded": "未ダウンロード",
   "initFailed": "初期化に失敗しました。モデルファイルを確認してください",
   "exportSuccess": "エクスポート成功",
   "exportFailed": "エクスポート失敗",
   "deleteConfirm": "このセッションを削除しますか？",
-  "deleteSessionSuccess": "セッションを削除しました"
+  "deleteSessionSuccess": "セッションを削除しました",
+  "downloadModel": "モデルをダウンロード",
+  "deleteModel": "モデルを削除",
+  "modelDownloaded": "ダウンロード済み",
+  "downloading": "ダウンロード中",
+  "downloadFailed": "ダウンロード失敗",
+  "vadModel": "VADモデル",
+  "supportedLanguages": "対応言語",
+  "modelSize": "サイズ",
+  "selectModel": "タップして選択",
+  "currentModel": "現在使用中"
 }

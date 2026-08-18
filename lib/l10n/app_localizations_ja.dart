@@ -129,7 +129,7 @@ class AppLocJa extends AppLoc {
   String get recordPermissionDenied => 'マイクの権限が必要です';
 
   @override
-  String get modelNotDownloaded => 'モデルがダウンロードされていません。設定でダウンロードしてください';
+  String get modelNotDownloaded => '未ダウンロード';
 
   @override
   String get initFailed => '初期化に失敗しました。モデルファイルを確認してください';
@@ -145,4 +145,34 @@ class AppLocJa extends AppLoc {
 
   @override
   String get deleteSessionSuccess => 'セッションを削除しました';
+
+  @override
+  String get downloadModel => 'モデルをダウンロード';
+
+  @override
+  String get deleteModel => 'モデルを削除';
+
+  @override
+  String get modelDownloaded => 'ダウンロード済み';
+
+  @override
+  String get downloading => 'ダウンロード中';
+
+  @override
+  String get downloadFailed => 'ダウンロード失敗';
+
+  @override
+  String get vadModel => 'VADモデル';
+
+  @override
+  String get supportedLanguages => '対応言語';
+
+  @override
+  String get modelSize => 'サイズ';
+
+  @override
+  String get selectModel => 'タップして選択';
+
+  @override
+  String get currentModel => '現在使用中';
 }

@@ -129,7 +129,7 @@ class AppLocZh extends AppLoc {
   String get recordPermissionDenied => '需要麦克风权限';
 
   @override
-  String get modelNotDownloaded => '模型未下载，请先在设置中下载';
+  String get modelNotDownloaded => '未下载';
 
   @override
   String get initFailed => '初始化失败，请检查模型文件';
@@ -145,4 +145,34 @@ class AppLocZh extends AppLoc {
 
   @override
   String get deleteSessionSuccess => '已删除会话';
+
+  @override
+  String get downloadModel => '下载模型';
+
+  @override
+  String get deleteModel => '删除模型';
+
+  @override
+  String get modelDownloaded => '已下载';
+
+  @override
+  String get downloading => '下载中';
+
+  @override
+  String get downloadFailed => '下载失败';
+
+  @override
+  String get vadModel => 'VAD 模型';
+
+  @override
+  String get supportedLanguages => '支持语言';
+
+  @override
+  String get modelSize => '大小';
+
+  @override
+  String get selectModel => '点击选择';
+
+  @override
+  String get currentModel => '当前使用';
 }

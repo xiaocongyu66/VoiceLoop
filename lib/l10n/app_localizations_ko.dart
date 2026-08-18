@@ -129,7 +129,7 @@ class AppLocKo extends AppLoc {
   String get recordPermissionDenied => '마이크 권한이 필요합니다';
 
   @override
-  String get modelNotDownloaded => '모델이 다운로드되지 않았습니다. 설정에서 먼저 다운로드하세요';
+  String get modelNotDownloaded => '다운로드 안 됨';
 
   @override
   String get initFailed => '초기화 실패. 모델 파일을 확인하세요';
@@ -145,4 +145,34 @@ class AppLocKo extends AppLoc {
 
   @override
   String get deleteSessionSuccess => '세션이 삭제되었습니다';
+
+  @override
+  String get downloadModel => '모델 다운로드';
+
+  @override
+  String get deleteModel => '모델 삭제';
+
+  @override
+  String get modelDownloaded => '다운로드됨';
+
+  @override
+  String get downloading => '다운로드 중';
+
+  @override
+  String get downloadFailed => '다운로드 실패';
+
+  @override
+  String get vadModel => 'VAD 모델';
+
+  @override
+  String get supportedLanguages => '지원 언어';
+
+  @override
+  String get modelSize => '크기';
+
+  @override
+  String get selectModel => '탭하여 선택';
+
+  @override
+  String get currentModel => '현재 사용 중';
 }

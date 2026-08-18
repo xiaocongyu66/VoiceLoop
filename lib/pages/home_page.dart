@@ -8,6 +8,7 @@ import '../core/constants/languages.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/pipeline_provider.dart';
 import '../providers/settings_provider.dart';
+import '../services/overlay_service.dart';
 import '../widgets/language_selector.dart';
 import '../widgets/record_button.dart' as rb;
 import '../widgets/translation_card.dart';
@@ -23,6 +24,7 @@ class HomePage extends ConsumerWidget {
     final partialText = ref.watch(partialTextProvider);
     final lastTranslation = ref.watch(lastTranslationProvider);
     final settingsNotifier = ref.read(settingsProvider.notifier);
+    final overlayService = ref.read(overlayProvider);
 
     final buttonState = _mapState(pipelineState);
     final sourceLang = AppLanguages.byCode(settings.sourceLanguage);
@@ -32,6 +34,12 @@ class HomePage extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l.appTitle),
         actions: [
+          IconButton(
+            icon: Icon(
+              overlayService.isVisible ? Icons.close_fullscreen : Icons.picture_in_picture,
+            ),
+            onPressed: () => overlayService.toggle(context, ref),
+          ),
           IconButton(
             icon: const Icon(Icons.history_rounded),
             onPressed: () => context.go('/history'),

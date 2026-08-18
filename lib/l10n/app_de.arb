@@ -40,10 +40,20 @@
   "swapLanguages": "Sprachen tauschen",
   "selectLanguage": "Sprache auswählen",
   "recordPermissionDenied": "Mikrofonberechtigung erforderlich",
-  "modelNotDownloaded": "Modell nicht heruntergeladen, bitte in den Einstellungen herunterladen",
+  "modelNotDownloaded": "Nicht heruntergeladen",
   "initFailed": "Initialisierung fehlgeschlagen, bitte Modelldateien prüfen",
   "exportSuccess": "Export erfolgreich",
   "exportFailed": "Export fehlgeschlagen",
   "deleteConfirm": "Möchten Sie diese Sitzung wirklich löschen?",
-  "deleteSessionSuccess": "Sitzung gelöscht"
+  "deleteSessionSuccess": "Sitzung gelöscht",
+  "downloadModel": "Modell herunterladen",
+  "deleteModel": "Modell löschen",
+  "modelDownloaded": "Heruntergeladen",
+  "downloading": "Wird heruntergeladen",
+  "downloadFailed": "Download fehlgeschlagen",
+  "vadModel": "VAD-Modell",
+  "supportedLanguages": "Unterstützte Sprachen",
+  "modelSize": "Größe",
+  "selectModel": "Zum Auswählen tippen",
+  "currentModel": "Aktuell"
 }

@@ -76,6 +76,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _persist();
   }
 
+  Future<void> updateTtsModel(String? modelId) async {
+    state = state.copyWith(ttsModelId: modelId);
+    await _persist();
+  }
+
   Future<void> updateTranslationEngine(TranslationEngine engine) async {
     state = state.copyWith(translationEngine: engine);
     await _persist();

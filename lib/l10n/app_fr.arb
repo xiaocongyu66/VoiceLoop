@@ -40,10 +40,20 @@
   "swapLanguages": "Inverser les langues",
   "selectLanguage": "Sélectionner la langue",
   "recordPermissionDenied": "Permission de microphone requise",
-  "modelNotDownloaded": "Modèle non téléchargé, veuillez le télécharger dans les paramètres",
+  "modelNotDownloaded": "Non téléchargé",
   "initFailed": "Échec de l'initialisation, vérifiez les fichiers de modèle",
   "exportSuccess": "Export réussi",
   "exportFailed": "Échec de l'export",
   "deleteConfirm": "Voulez-vous vraiment supprimer cette session?",
-  "deleteSessionSuccess": "Session supprimée"
+  "deleteSessionSuccess": "Session supprimée",
+  "downloadModel": "Télécharger le modèle",
+  "deleteModel": "Supprimer le modèle",
+  "modelDownloaded": "Téléchargé",
+  "downloading": "Téléchargement",
+  "downloadFailed": "Échec du téléchargement",
+  "vadModel": "Modèle VAD",
+  "supportedLanguages": "Langues supportées",
+  "modelSize": "Taille",
+  "selectModel": "Touchez pour sélectionner",
+  "currentModel": "Actuel"
 }

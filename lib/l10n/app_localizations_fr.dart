@@ -133,8 +133,7 @@ class AppLocFr extends AppLoc {
   String get recordPermissionDenied => 'Permission de microphone requise';
 
   @override
-  String get modelNotDownloaded =>
-      'Modèle non téléchargé, veuillez le télécharger dans les paramètres';
+  String get modelNotDownloaded => 'Non téléchargé';
 
   @override
   String get initFailed =>
@@ -151,4 +150,34 @@ class AppLocFr extends AppLoc {
 
   @override
   String get deleteSessionSuccess => 'Session supprimée';
+
+  @override
+  String get downloadModel => 'Télécharger le modèle';
+
+  @override
+  String get deleteModel => 'Supprimer le modèle';
+
+  @override
+  String get modelDownloaded => 'Téléchargé';
+
+  @override
+  String get downloading => 'Téléchargement';
+
+  @override
+  String get downloadFailed => 'Échec du téléchargement';
+
+  @override
+  String get vadModel => 'Modèle VAD';
+
+  @override
+  String get supportedLanguages => 'Langues supportées';
+
+  @override
+  String get modelSize => 'Taille';
+
+  @override
+  String get selectModel => 'Touchez pour sélectionner';
+
+  @override
+  String get currentModel => 'Actuel';
 }

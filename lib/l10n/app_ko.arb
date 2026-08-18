@@ -40,10 +40,20 @@
   "swapLanguages": "언어 교환",
   "selectLanguage": "언어 선택",
   "recordPermissionDenied": "마이크 권한이 필요합니다",
-  "modelNotDownloaded": "모델이 다운로드되지 않았습니다. 설정에서 먼저 다운로드하세요",
+  "modelNotDownloaded": "다운로드 안 됨",
   "initFailed": "초기화 실패. 모델 파일을 확인하세요",
   "exportSuccess": "내보내기 성공",
   "exportFailed": "내보내기 실패",
   "deleteConfirm": "이 세션을 삭제하시겠습니까?",
-  "deleteSessionSuccess": "세션이 삭제되었습니다"
+  "deleteSessionSuccess": "세션이 삭제되었습니다",
+  "downloadModel": "모델 다운로드",
+  "deleteModel": "모델 삭제",
+  "modelDownloaded": "다운로드됨",
+  "downloading": "다운로드 중",
+  "downloadFailed": "다운로드 실패",
+  "vadModel": "VAD 모델",
+  "supportedLanguages": "지원 언어",
+  "modelSize": "크기",
+  "selectModel": "탭하여 선택",
+  "currentModel": "현재 사용 중"
 }

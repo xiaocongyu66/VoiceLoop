@@ -130,8 +130,7 @@ class AppLocEn extends AppLoc {
   String get recordPermissionDenied => 'Microphone permission required';
 
   @override
-  String get modelNotDownloaded =>
-      'Model not downloaded, please download it in settings first';
+  String get modelNotDownloaded => 'Not Downloaded';
 
   @override
   String get initFailed => 'Initialization failed, please check model files';
@@ -147,4 +146,34 @@ class AppLocEn extends AppLoc {
 
   @override
   String get deleteSessionSuccess => 'Session deleted';
+
+  @override
+  String get downloadModel => 'Download Model';
+
+  @override
+  String get deleteModel => 'Delete Model';
+
+  @override
+  String get modelDownloaded => 'Downloaded';
+
+  @override
+  String get downloading => 'Downloading';
+
+  @override
+  String get downloadFailed => 'Download Failed';
+
+  @override
+  String get vadModel => 'VAD Model';
+
+  @override
+  String get supportedLanguages => 'Supported Languages';
+
+  @override
+  String get modelSize => 'Size';
+
+  @override
+  String get selectModel => 'Tap to select';
+
+  @override
+  String get currentModel => 'Current';
 }

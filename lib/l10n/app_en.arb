@@ -45,5 +45,16 @@
   "exportSuccess": "Export successful",
   "exportFailed": "Export failed",
   "deleteConfirm": "Are you sure you want to delete this session?",
-  "deleteSessionSuccess": "Session deleted"
+  "deleteSessionSuccess": "Session deleted",
+  "downloadModel": "Download Model",
+  "deleteModel": "Delete Model",
+  "modelDownloaded": "Downloaded",
+  "modelNotDownloaded": "Not Downloaded",
+  "downloading": "Downloading",
+  "downloadFailed": "Download Failed",
+  "vadModel": "VAD Model",
+  "supportedLanguages": "Supported Languages",
+  "modelSize": "Size",
+  "selectModel": "Tap to select",
+  "currentModel": "Current"
 }

@@ -348,7 +348,7 @@ abstract class AppLoc {
   /// No description provided for @modelNotDownloaded.
   ///
   /// In zh, this message translates to:
-  /// **'模型未下载，请先在设置中下载'**
+  /// **'未下载'**
   String get modelNotDownloaded;
 
   /// No description provided for @initFailed.
@@ -380,6 +380,66 @@ abstract class AppLoc {
   /// In zh, this message translates to:
   /// **'已删除会话'**
   String get deleteSessionSuccess;
+
+  /// No description provided for @downloadModel.
+  ///
+  /// In zh, this message translates to:
+  /// **'下载模型'**
+  String get downloadModel;
+
+  /// No description provided for @deleteModel.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除模型'**
+  String get deleteModel;
+
+  /// No description provided for @modelDownloaded.
+  ///
+  /// In zh, this message translates to:
+  /// **'已下载'**
+  String get modelDownloaded;
+
+  /// No description provided for @downloading.
+  ///
+  /// In zh, this message translates to:
+  /// **'下载中'**
+  String get downloading;
+
+  /// No description provided for @downloadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'下载失败'**
+  String get downloadFailed;
+
+  /// No description provided for @vadModel.
+  ///
+  /// In zh, this message translates to:
+  /// **'VAD 模型'**
+  String get vadModel;
+
+  /// No description provided for @supportedLanguages.
+  ///
+  /// In zh, this message translates to:
+  /// **'支持语言'**
+  String get supportedLanguages;
+
+  /// No description provided for @modelSize.
+  ///
+  /// In zh, this message translates to:
+  /// **'大小'**
+  String get modelSize;
+
+  /// No description provided for @selectModel.
+  ///
+  /// In zh, this message translates to:
+  /// **'点击选择'**
+  String get selectModel;
+
+  /// No description provided for @currentModel.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前使用'**
+  String get currentModel;
 }
 
 class _AppLocDelegate extends LocalizationsDelegate<AppLoc> {

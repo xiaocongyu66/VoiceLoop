@@ -30,6 +30,9 @@ class AudioPipeline {
   final StreamController<TranslationResult> _translationController =
       StreamController<TranslationResult>.broadcast();
 
+  final StreamController<String> _errorController =
+      StreamController<String>.broadcast();
+
   final List<double> _buffer = [];
 
   PipelineState _state = PipelineState.idle;
@@ -53,6 +56,8 @@ class AudioPipeline {
 
   Stream<TranslationResult> get translationStream =>
       _translationController.stream;
+
+  Stream<String> get errorStream => _errorController.stream;
 
   void _setState(PipelineState newState) {
     _state = newState;
@@ -89,14 +94,22 @@ class AudioPipeline {
       final chunk = Float32List.fromList(_buffer.sublist(0, chunkSize));
       _buffer.removeRange(0, chunkSize);
 
-      vadService.acceptWaveform(chunk);
-      vadService.flush();
-      while (!vadService.isEmpty()) {
-        final segment = vadService.front();
-        if (segment.samples.isNotEmpty) {
-          _handleSpeechSegment(segment.samples, sourceLang, targetLang);
+      if (vadService.isInitialized) {
+        vadService.acceptWaveform(chunk);
+        vadService.flush();
+        while (!vadService.isEmpty()) {
+          final segment = vadService.front();
+          if (segment.samples.isNotEmpty) {
+            _handleSpeechSegment(
+              Float32List.fromList(segment.samples),
+              sourceLang,
+              targetLang,
+            );
+          }
+          vadService.clear();
         }
-        vadService.clear();
+      } else {
+        _handleSpeechSegment(chunk, sourceLang, targetLang);
       }
     }
   }
@@ -108,7 +121,15 @@ class AudioPipeline {
   ) async {
     _setState(PipelineState.recognizing);
 
-    final text = asrService.recognize(speech);
+    String text = '';
+    try {
+      text = asrService.recognize(speech);
+    } catch (e) {
+      _errorController.add('recognitionFailed');
+      _setState(PipelineState.listening);
+      return;
+    }
+
     if (text.isEmpty) {
       _setState(PipelineState.listening);
       return;
@@ -118,7 +139,13 @@ class AudioPipeline {
 
     if (onTranslate != null) {
       _setState(PipelineState.translating);
-      final translated = await onTranslate!(text, sourceLang, targetLang);
+      String translated;
+      try {
+        translated = await onTranslate!(text, sourceLang, targetLang);
+      } catch (e) {
+        _errorController.add('translationFailed');
+        translated = '[Translation failed: $e]';
+      }
 
       final result = TranslationResult(
         originalText: text,
@@ -131,13 +158,21 @@ class AudioPipeline {
 
       if (onSynthesize != null) {
         _setState(PipelineState.speaking);
-        await onSynthesize!(translated, targetLang);
+        try {
+          await onSynthesize!(translated, targetLang);
+        } catch (e) {
+          _errorController.add('ttsFailed');
+        }
       }
     }
 
     if (_running) {
       _setState(PipelineState.listening);
     }
+  }
+
+  void emitError(String error) {
+    _errorController.add(error);
   }
 
   Future<void> stop() async {
@@ -154,6 +189,7 @@ class AudioPipeline {
     await _stateController.close();
     await _partialTextController.close();
     await _translationController.close();
+    await _errorController.close();
     await _recorder?.dispose();
   }
 }
