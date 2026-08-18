@@ -59,10 +59,16 @@ class SettingsPage extends ConsumerWidget {
                 label: l.asrModel,
                 value: settings.asrModelId,
                 items: const [
-                  DropdownMenuItem(value: 'sensevoice-small', child: Text('SenseVoice Small')),
-                  DropdownMenuItem(value: 'sensevoice-large', child: Text('SenseVoice Large')),
-                  DropdownMenuItem(value: 'whisper-tiny', child: Text('Whisper Tiny')),
-                  DropdownMenuItem(value: 'whisper-base', child: Text('Whisper Base')),
+                  DropdownMenuItem(
+                      value: 'sensevoice-small',
+                      child: Text('SenseVoice Small')),
+                  DropdownMenuItem(
+                      value: 'sensevoice-large',
+                      child: Text('SenseVoice Large')),
+                  DropdownMenuItem(
+                      value: 'whisper-tiny', child: Text('Whisper Tiny')),
+                  DropdownMenuItem(
+                      value: 'whisper-base', child: Text('Whisper Base')),
                 ],
                 onChanged: (v) {
                   if (v != null) notifier.updateAsrModel(v);
@@ -74,8 +80,10 @@ class SettingsPage extends ConsumerWidget {
                 value: settings.ttsModelId ?? '',
                 items: const [
                   DropdownMenuItem(value: 'edge-tts', child: Text('Edge TTS')),
-                  DropdownMenuItem(value: 'sherpa-onnx', child: Text('Sherpa-ONNX')),
-                  DropdownMenuItem(value: 'flutter-tts', child: Text('Flutter TTS')),
+                  DropdownMenuItem(
+                      value: 'sherpa-onnx', child: Text('Sherpa-ONNX')),
+                  DropdownMenuItem(
+                      value: 'flutter-tts', child: Text('Flutter TTS')),
                 ],
                 onChanged: (v) {
                   if (v != null) {
@@ -94,9 +102,14 @@ class SettingsPage extends ConsumerWidget {
                 label: l.translationEngineLabel,
                 value: settings.translationEngine,
                 items: const [
-                  DropdownMenuItem(value: TranslationEngine.mlKit, child: Text('ML Kit')),
-                  DropdownMenuItem(value: TranslationEngine.appleTranslation, child: Text('Apple Translation')),
-                  DropdownMenuItem(value: TranslationEngine.systemTranslator, child: Text('System Translator')),
+                  DropdownMenuItem(
+                      value: TranslationEngine.mlKit, child: Text('ML Kit')),
+                  DropdownMenuItem(
+                      value: TranslationEngine.appleTranslation,
+                      child: Text('Apple Translation')),
+                  DropdownMenuItem(
+                      value: TranslationEngine.systemTranslator,
+                      child: Text('System Translator')),
                 ],
                 onChanged: (v) {
                   if (v != null) notifier.updateTranslationEngine(v);

@@ -112,7 +112,8 @@ class _MirrorHalf extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: isSource ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+        crossAxisAlignment:
+            isSource ? CrossAxisAlignment.start : CrossAxisAlignment.end,
         children: [
           Row(
             mainAxisSize: MainAxisSize.min,

@@ -21,8 +21,10 @@ class TranslationCard extends StatelessWidget {
     final theme = context.theme;
     final hasResult = result != null;
     final hasPartial = partialText != null && partialText!.isNotEmpty;
-    final sourceLang = hasResult ? AppLanguages.byCode(result!.sourceLanguage) : null;
-    final targetLang = hasResult ? AppLanguages.byCode(result!.targetLanguage) : null;
+    final sourceLang =
+        hasResult ? AppLanguages.byCode(result!.sourceLanguage) : null;
+    final targetLang =
+        hasResult ? AppLanguages.byCode(result!.targetLanguage) : null;
 
     return Card(
       elevation: 0,
@@ -97,7 +99,8 @@ class TranslationCard extends StatelessWidget {
                     height: 16,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation(theme.colorScheme.primary),
+                      valueColor:
+                          AlwaysStoppedAnimation(theme.colorScheme.primary),
                     ),
                   ),
                   const SizedBox(width: 8),

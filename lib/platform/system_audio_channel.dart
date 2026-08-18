@@ -32,21 +32,18 @@ class SystemAudioChannel {
   }
 
   Stream<Float32List> get audioStream {
-    _audioStream ??= _streamChannel
-        .receiveBroadcastStream()
-        .map((dynamic event) {
-          if (event is Float32List) {
-            return event;
-          }
-          if (event is List) {
-            return Float32List.fromList(event.cast<double>());
-          }
-          throw const FormatException(
-              'Unexpected audio stream event type');
-        })
-        .handleError((Object error) {
-          Logger.e('audioStream error: $error');
-        });
+    _audioStream ??=
+        _streamChannel.receiveBroadcastStream().map((dynamic event) {
+      if (event is Float32List) {
+        return event;
+      }
+      if (event is List) {
+        return Float32List.fromList(event.cast<double>());
+      }
+      throw const FormatException('Unexpected audio stream event type');
+    }).handleError((Object error) {
+      Logger.e('audioStream error: $error');
+    });
     return _audioStream!;
   }
 }

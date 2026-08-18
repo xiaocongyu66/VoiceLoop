@@ -23,14 +23,18 @@ class LanguageSelector extends StatelessWidget {
         prefixIcon: value != null
             ? Padding(
                 padding: const EdgeInsets.only(left: 12, right: 8),
-                child: Center(child: Text(value!.flag, style: const TextStyle(fontSize: 22))),
+                child: Center(
+                    child: Text(value!.flag,
+                        style: const TextStyle(fontSize: 22))),
               )
             : null,
-        prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+        prefixIconConstraints:
+            const BoxConstraints(minWidth: 44, minHeight: 44),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<LanguageInfo>(

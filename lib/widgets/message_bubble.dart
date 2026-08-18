@@ -12,9 +12,13 @@ class MessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.theme;
     final isOutgoing = message.direction == MessageDirection.outgoing;
-    final align = isOutgoing ? CrossAxisAlignment.end : CrossAxisAlignment.start;
-    final bubbleColor = isOutgoing ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest;
-    final textColor = isOutgoing ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface;
+    final align =
+        isOutgoing ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    final bubbleColor = isOutgoing
+        ? theme.colorScheme.primary
+        : theme.colorScheme.surfaceContainerHighest;
+    final textColor =
+        isOutgoing ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -31,8 +35,10 @@ class MessageBubble extends StatelessWidget {
               borderRadius: BorderRadius.only(
                 topLeft: const Radius.circular(18),
                 topRight: const Radius.circular(18),
-                bottomLeft: isOutgoing ? const Radius.circular(18) : Radius.zero,
-                bottomRight: isOutgoing ? Radius.zero : const Radius.circular(18),
+                bottomLeft:
+                    isOutgoing ? const Radius.circular(18) : Radius.zero,
+                bottomRight:
+                    isOutgoing ? Radius.zero : const Radius.circular(18),
               ),
               boxShadow: [
                 BoxShadow(
@@ -43,7 +49,9 @@ class MessageBubble extends StatelessWidget {
               ],
             ),
             child: Column(
-              crossAxisAlignment: isOutgoing ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment: isOutgoing
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
               children: [
                 Text(
                   message.originalText,
