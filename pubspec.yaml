@@ -1,0 +1,38 @@
+name: voice_loop
+description: "VoiceLoop - Privacy-first offline speech translation"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.13.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  flutter_riverpod: ^2.4.9
+  sherpa_onnx: ^1.10.39
+  record: ^5.0.4
+  flutter_tts: ^4.0.2
+  go_router: ^13.0.0
+  path_provider: ^2.1.0
+  shared_preferences: ^2.2.2
+  permission_handler: ^11.1.0
+  uuid: ^4.3.3
+  intl: ^0.18.1
+  archive: ^3.4.10
+  path: ^1.8.3
+  collection: ^1.18.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/models/
+    - assets/icons/
+    - assets/lottie/
