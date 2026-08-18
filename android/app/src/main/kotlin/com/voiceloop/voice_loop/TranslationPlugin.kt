@@ -81,7 +81,7 @@ class TranslationPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
     private fun getSupportedLanguages(result: MethodChannel.Result) {
         try {
-            val languages = TranslateLanguage.getAllLanguages().mapNotNull { it.toLanguageTag() }
+            val languages = TranslateLanguage.getAllLanguages().map { it.toString() }
             result.success(languages)
         } catch (e: Exception) {
             result.error("LIST_FAILED", e.message, null)
