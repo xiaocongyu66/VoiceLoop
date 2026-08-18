@@ -32,7 +32,7 @@ class MirrorPage extends ConsumerWidget {
               child: _MirrorHalf(
                 flag: sourceLang?.flag ?? '🌐',
                 langName: sourceLang?.nativeName ?? settings.sourceLanguage,
-                originalText: lastTranslation?.originalText ?? partialText ?? '',
+                originalText: lastTranslation?.originalText ?? partialText,
                 translatedText: lastTranslation?.translatedText ?? '',
                 isSource: true,
               ),

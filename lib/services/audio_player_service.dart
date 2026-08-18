@@ -11,6 +11,8 @@ class AudioPlayerService {
 
   bool _isPlaying = false;
 
+  bool get isPlayingState => _isPlaying;
+
   Stream<bool> get isPlaying => _playingController.stream;
 
   AudioPlayerService() {
