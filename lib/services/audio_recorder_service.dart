@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:record/record.dart';
+import 'package:flutter_sound/flutter_sound.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class AudioRecorderService {
-  final AudioRecorder _recorder = AudioRecorder();
+  final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
 
   final StreamController<Float32List> _audioController =
       StreamController<Float32List>.broadcast();
@@ -12,50 +13,50 @@ class AudioRecorderService {
   StreamSubscription? _recordingSub;
 
   bool _isRecording = false;
+  bool _initialized = false;
 
   bool get isRecording => _isRecording;
 
   Stream<Float32List> get audioStream => _audioController.stream;
 
   Future<bool> hasPermission() async {
-    return await _recorder.hasPermission();
+    final status = await Permission.microphone.status;
+    if (status.isGranted) return true;
+    final result = await Permission.microphone.request();
+    return result.isGranted;
+  }
+
+  Future<void> _ensureInit() async {
+    if (_initialized) return;
+    await _recorder.openRecorder();
+    _initialized = true;
   }
 
   Future<void> start() async {
     if (_isRecording) return;
+    await _ensureInit();
 
-    final stream = await _recorder.startStream(
-      const RecordConfig(
-        encoder: AudioEncoder.pcm16bits,
-        sampleRate: 16000,
-        numChannels: 1,
-        autoGain: true,
-        echoCancel: true,
-        noiseSuppress: true,
-      ),
+    final sink = StreamController<List<Float32List>>.broadcast();
+
+    await _recorder.startRecorder(
+      codec: Codec.pcm16,
+      sampleRate: 16000,
+      numChannels: 1,
+      toStreamFloat32: sink.sink,
     );
 
     _isRecording = true;
 
-    _recordingSub = stream.listen((data) {
-      _audioController.add(_pcm16ToFloat32(data));
+    _recordingSub = sink.stream.listen((chunks) {
+      for (final chunk in chunks) {
+        _audioController.add(chunk);
+      }
     });
-  }
-
-  Float32List _pcm16ToFloat32(Uint8List bytes) {
-    final length = bytes.length ~/ 2;
-    final result = Float32List(length);
-    final byteData = ByteData.sublistView(bytes);
-    for (var i = 0; i < length; i++) {
-      final sample = byteData.getInt16(i * 2, Endian.little);
-      result[i] = sample / 32768.0;
-    }
-    return result;
   }
 
   Future<void> stop() async {
     if (!_isRecording) return;
-    await _recorder.stop();
+    await _recorder.stopRecorder();
     await _recordingSub?.cancel();
     _recordingSub = null;
     _isRecording = false;
@@ -64,6 +65,8 @@ class AudioRecorderService {
   Future<void> dispose() async {
     await stop();
     await _audioController.close();
-    await _recorder.dispose();
+    if (_initialized) {
+      await _recorder.closeRecorder();
+    }
   }
 }
