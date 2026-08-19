@@ -26,7 +26,8 @@ class ImmersiveTranslationView extends StatelessWidget {
     final l = AppLoc.of(context)!;
     final hasResult = result != null;
     final hasPartial = partialText != null && partialText!.isNotEmpty;
-    final isActive = state == PipelineDisplayState.listening ||
+    final isActive =
+        state == PipelineDisplayState.listening ||
         state == PipelineDisplayState.recognizing;
 
     return Expanded(
@@ -45,14 +46,7 @@ class ImmersiveTranslationView extends StatelessWidget {
               ),
             ),
             _buildDivider(context, state),
-            Expanded(
-              flex: 5,
-              child: _buildTargetPanel(
-                context,
-                l,
-                hasResult,
-              ),
-            ),
+            Expanded(flex: 5, child: _buildTargetPanel(context, l, hasResult)),
           ],
         ),
       ),
@@ -80,7 +74,10 @@ class ImmersiveTranslationView extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(12),
@@ -88,7 +85,10 @@ class ImmersiveTranslationView extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(sourceLang?.flag ?? '🌐', style: const TextStyle(fontSize: 14)),
+                    Text(
+                      sourceLang?.flag ?? '🌐',
+                      style: const TextStyle(fontSize: 14),
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       sourceLang?.nativeName ?? '',
@@ -173,11 +173,7 @@ class ImmersiveTranslationView extends StatelessWidget {
               shape: BoxShape.circle,
               color: color.withOpacity(0.15),
             ),
-            child: Icon(
-              _stateIcon(state),
-              size: 16,
-              color: color,
-            ),
+            child: Icon(_stateIcon(state), size: 16, color: color),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -199,11 +195,7 @@ class ImmersiveTranslationView extends StatelessWidget {
     );
   }
 
-  Widget _buildTargetPanel(
-    BuildContext context,
-    AppLoc l,
-    bool hasResult,
-  ) {
+  Widget _buildTargetPanel(BuildContext context, AppLoc l, bool hasResult) {
     final theme = Theme.of(context);
     final translatedText = hasResult ? result!.translatedText : '';
 
@@ -217,7 +209,10 @@ class ImmersiveTranslationView extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primary.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
@@ -225,7 +220,10 @@ class ImmersiveTranslationView extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(targetLang?.flag ?? '🌐', style: const TextStyle(fontSize: 14)),
+                    Text(
+                      targetLang?.flag ?? '🌐',
+                      style: const TextStyle(fontSize: 14),
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       targetLang?.nativeName ?? '',

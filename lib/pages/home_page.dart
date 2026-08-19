@@ -23,7 +23,7 @@ class HomePage extends ConsumerWidget {
     final partialText = ref.watch(partialTextProvider);
     final lastTranslation = ref.watch(lastTranslationProvider);
     final settingsNotifier = ref.read(settingsProvider.notifier);
-    final overlayService = ref.read(overlayProvider);
+    final overlayVisible = ref.watch(overlayVisibleProvider);
 
     final sourceLang = AppLanguages.byCode(settings.sourceLanguage);
     final targetLang = AppLanguages.byCode(settings.targetLanguage);
@@ -33,52 +33,60 @@ class HomePage extends ConsumerWidget {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xFF0A0E21)
-                  : const Color(0xFF1A1A2E),
-              Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xFF0D1117)
-                  : const Color(0xFF16213E),
-            ],
+      body: OverlayManager(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF0A0E21)
+                    : const Color(0xFF1A1A2E),
+                Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF0D1117)
+                    : const Color(0xFF16213E),
+              ],
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              _buildTopBar(context, l, ref, overlayService),
-              const SizedBox(height: 8),
-              ImmersiveTranslationView(
-                result: lastTranslation,
-                partialText: partialText,
-                state: displayState,
-                sourceLang: sourceLang,
-                targetLang: targetLang,
-              ),
-              const SizedBox(height: 16),
-              _buildLanguageBar(context, settings, sourceLang, targetLang, settingsNotifier),
-              const SizedBox(height: 20),
-              ImmersiveRecordButton(
-                state: buttonState,
-                onPressed: () {
-                  final notifier = ref.read(pipelineStateProvider.notifier);
-                  if (pipelineState == PipelineState.idle) {
-                    notifier.start(
-                      sourceLang: settings.sourceLanguage,
-                      targetLang: settings.targetLanguage,
-                    );
-                  } else {
-                    notifier.stop();
-                  }
-                },
-              ),
-              const SizedBox(height: 32),
-            ],
+          child: SafeArea(
+            child: Column(
+              children: [
+                _buildTopBar(context, l, ref, overlayVisible),
+                const SizedBox(height: 8),
+                ImmersiveTranslationView(
+                  result: lastTranslation,
+                  partialText: partialText,
+                  state: displayState,
+                  sourceLang: sourceLang,
+                  targetLang: targetLang,
+                ),
+                const SizedBox(height: 16),
+                _buildLanguageBar(
+                  context,
+                  settings,
+                  sourceLang,
+                  targetLang,
+                  settingsNotifier,
+                ),
+                const SizedBox(height: 20),
+                ImmersiveRecordButton(
+                  state: buttonState,
+                  onPressed: () {
+                    final notifier = ref.read(pipelineStateProvider.notifier);
+                    if (pipelineState == PipelineState.idle) {
+                      notifier.start(
+                        sourceLang: settings.sourceLanguage,
+                        targetLang: settings.targetLanguage,
+                      );
+                    } else {
+                      notifier.stop();
+                    }
+                  },
+                ),
+                const SizedBox(height: 32),
+              ],
+            ),
           ),
         ),
       ),
@@ -89,7 +97,7 @@ class HomePage extends ConsumerWidget {
     BuildContext context,
     AppLoc l,
     WidgetRef ref,
-    OverlayService overlayService,
+    bool overlayVisible,
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -106,12 +114,12 @@ class HomePage extends ConsumerWidget {
           const Spacer(),
           IconButton(
             icon: Icon(
-              overlayService.isVisible
+              overlayVisible
                   ? Icons.close_fullscreen
                   : Icons.picture_in_picture,
               color: Colors.white70,
             ),
-            onPressed: () => overlayService.toggle(context, ref),
+            onPressed: () => ref.read(overlayVisibleProvider.notifier).toggle(),
           ),
           IconButton(
             icon: const Icon(Icons.history_rounded, color: Colors.white70),
@@ -204,12 +212,17 @@ class HomePage extends ConsumerWidget {
                       : settings.targetLanguage;
                   final isSelected = lang.code.name == currentCode;
                   return ListTile(
-                    leading: Text(lang.flag, style: const TextStyle(fontSize: 24)),
+                    leading: Text(
+                      lang.flag,
+                      style: const TextStyle(fontSize: 24),
+                    ),
                     title: Text(
                       lang.nativeName,
                       style: TextStyle(
                         color: isSelected ? Colors.white : Colors.white70,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                     ),
                     subtitle: Text(

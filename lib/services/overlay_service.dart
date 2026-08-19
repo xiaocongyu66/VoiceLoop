@@ -1,55 +1,53 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../core/constants/languages.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/pipeline_provider.dart';
 import '../providers/settings_provider.dart';
-import '../core/constants/languages.dart';
+import '../widgets/translation_widgets.dart';
+import '../models/translation_result.dart';
 
-class OverlayService {
-  OverlayEntry? _entry;
-  bool get isVisible => _entry != null;
-
-  void show(BuildContext context, WidgetRef ref) {
-    if (_entry != null) return;
-    _entry = OverlayEntry(
-      builder: (ctx) => ProviderScope(
-        overrides: const [],
-        child: Consumer(
-          builder: (ctx2, ref2, _) => _FloatingTranslationOverlay(ref: ref2),
-        ),
-      ),
+final overlayVisibleProvider =
+    StateNotifierProvider<OverlayVisibleNotifier, bool>(
+      (ref) => OverlayVisibleNotifier(),
     );
-    Overlay.of(context, rootOverlay: true).insert(_entry!);
-  }
 
-  void hide() {
-    _entry?.remove();
-    _entry = null;
-  }
-
-  void toggle(BuildContext context, WidgetRef ref) {
-    if (isVisible) {
-      hide();
-    } else {
-      show(context, ref);
-    }
-  }
+class OverlayVisibleNotifier extends StateNotifier<bool> {
+  OverlayVisibleNotifier() : super(false);
+  void toggle() => state = !state;
+  void show() => state = true;
+  void hide() => state = false;
 }
 
-final overlayProvider = Provider<OverlayService>((ref) => OverlayService());
+class OverlayManager extends ConsumerWidget {
+  final Widget child;
 
-class _FloatingTranslationOverlay extends ConsumerStatefulWidget {
-  const _FloatingTranslationOverlay({required this.ref});
-  final WidgetRef ref;
+  const OverlayManager({super.key, required this.child});
 
   @override
-  ConsumerState<_FloatingTranslationOverlay> createState() =>
-      _FloatingTranslationOverlayState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final visible = ref.watch(overlayVisibleProvider);
+    return Stack(
+      children: [
+        child,
+        if (visible) const Positioned.fill(child: _FloatingOverlay()),
+      ],
+    );
+  }
 }
 
-class _FloatingTranslationOverlayState
-    extends ConsumerState<_FloatingTranslationOverlay> {
-  Offset _position = const Offset(20, 80);
+class _FloatingOverlay extends ConsumerStatefulWidget {
+  const _FloatingOverlay();
+
+  @override
+  ConsumerState<_FloatingOverlay> createState() => _FloatingOverlayState();
+}
+
+class _FloatingOverlayState extends ConsumerState<_FloatingOverlay> {
+  Offset _position = const Offset(24, 100);
   bool _expanded = true;
 
   @override
@@ -59,137 +57,74 @@ class _FloatingTranslationOverlayState
     final pipelineState = ref.watch(pipelineStateProvider);
     final partialText = ref.watch(partialTextProvider);
     final lastTranslation = ref.watch(lastTranslationProvider);
+    final screen = MediaQuery.of(context).size;
 
     final sourceLang = AppLanguages.byCode(settings.sourceLanguage);
     final targetLang = AppLanguages.byCode(settings.targetLanguage);
 
     return Positioned(
-      left: _position.dx,
-      top: _position.dy,
-      child: Material(
-        color: Colors.transparent,
-        child: GestureDetector(
-          onPanUpdate: (details) {
-            setState(() {
-              _position = Offset(
-                _position.dx + details.delta.dx,
-                _position.dy + details.delta.dy,
-              );
-            });
-          },
-          child: Container(
-            width: _expanded ? 280 : 56,
-            constraints: const BoxConstraints(maxHeight: 220),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHigh
-                  .withOpacity(0.95),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-              border: Border.all(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                width: 1,
+      left: _position.dx.clamp(8, screen.width - 300),
+      top: _position.dy.clamp(8, screen.height - 260),
+      child: GestureDetector(
+        onPanUpdate: (d) {
+          setState(() {
+            _position = Offset(
+              (_position.dx + d.delta.dx).clamp(8, screen.width - 300),
+              (_position.dy + d.delta.dy).clamp(8, screen.height - 260),
+            );
+          });
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: _expanded ? 284 : 48,
+          constraints: const BoxConstraints(maxHeight: 260),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1C1C1E).withOpacity(0.88),
+            borderRadius: BorderRadius.circular(22),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.5),
+                blurRadius: 20,
+                spreadRadius: 1,
+                offset: const Offset(0, 8),
               ),
+            ],
+            border: Border.all(
+              color: Colors.white.withOpacity(0.06),
+              width: 0.5,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(16),
-                    ),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(22),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildHeader(
+                    context,
+                    l,
+                    pipelineState,
+                    sourceLang,
+                    targetLang,
                   ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        _stateIcon(pipelineState),
-                        size: 16,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      ),
-                      const SizedBox(width: 8),
-                      if (_expanded) ...[
-                        Expanded(
-                          child: Text(
-                            _stateText(pipelineState, l),
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onPrimaryContainer,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                  if (_expanded)
+                    Flexible(
+                      child: Padding(
+                        padding: const EdgeInsets.all(14),
+                        child: _buildContent(
+                          context,
+                          l,
+                          lastTranslation,
+                          partialText,
+                          sourceLang,
+                          targetLang,
+                          pipelineState,
                         ),
-                        Text(
-                          '${sourceLang?.flag ?? ''} → ${targetLang?.flag ?? ''}',
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                      ],
-                      const SizedBox(width: 4),
-                      GestureDetector(
-                        onTap: () => setState(() => _expanded = !_expanded),
-                        child: Icon(
-                          _expanded ? Icons.expand_more : Icons.expand_less,
-                          size: 20,
-                          color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (_expanded) ...[
-                  Flexible(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (lastTranslation != null) ...[
-                            _OverlayText(
-                              label: sourceLang?.nativeName ?? '',
-                              flag: sourceLang?.flag ?? '',
-                              text: lastTranslation.originalText,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                            const SizedBox(height: 6),
-                            Container(height: 1, color: Theme.of(context).dividerColor),
-                            const SizedBox(height: 6),
-                            _OverlayText(
-                              label: targetLang?.nativeName ?? '',
-                              flag: targetLang?.flag ?? '',
-                              text: lastTranslation.translatedText,
-                              color: Theme.of(context).colorScheme.primary,
-                              bold: true,
-                            ),
-                          ] else if (partialText.isNotEmpty) ...[
-                            _OverlayText(
-                              label: sourceLang?.nativeName ?? '',
-                              flag: sourceLang?.flag ?? '',
-                              text: partialText,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                          ] else ...[
-                            Center(
-                              child: Text(
-                                l.tapToStart,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
                       ),
                     ),
-                  ),
                 ],
-              ],
+              ),
             ),
           ),
         ),
@@ -197,13 +132,149 @@ class _FloatingTranslationOverlayState
     );
   }
 
-  IconData _stateIcon(PipelineState s) {
+  Widget _buildHeader(
+    BuildContext context,
+    AppLoc l,
+    PipelineState state,
+    LanguageInfo? sourceLang,
+    LanguageInfo? targetLang,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.04),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+      ),
+      child: Row(
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: _stateColor(state),
+            ),
+          ),
+          const SizedBox(width: 8),
+          if (_expanded) ...[
+            Expanded(
+              child: Text(
+                _stateText(state, l),
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.65),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Text(
+              '${sourceLang?.flag ?? ''} → ${targetLang?.flag ?? ''}',
+              style: const TextStyle(fontSize: 12, color: Colors.white54),
+            ),
+            const SizedBox(width: 8),
+          ],
+          GestureDetector(
+            onTap: () => setState(() => _expanded = !_expanded),
+            child: Icon(
+              _expanded ? Icons.expand_more_rounded : Icons.expand_less_rounded,
+              size: 18,
+              color: Colors.white38,
+            ),
+          ),
+          const SizedBox(width: 4),
+          GestureDetector(
+            onTap: () => ref.read(overlayVisibleProvider.notifier).hide(),
+            child: const Icon(
+              Icons.close_rounded,
+              size: 16,
+              color: Colors.white38,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent(
+    BuildContext context,
+    AppLoc l,
+    TranslationResult? lastTranslation,
+    String partialText,
+    LanguageInfo? sourceLang,
+    LanguageInfo? targetLang,
+    PipelineState state,
+  ) {
+    if (lastTranslation != null) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _OverlayLine(
+            flag: sourceLang?.flag ?? '',
+            label: sourceLang?.nativeName ?? '',
+            text: lastTranslation.originalText,
+            color: Colors.white.withOpacity(0.75),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.transparent,
+                  Colors.white.withOpacity(0.08),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          _OverlayLine(
+            flag: targetLang?.flag ?? '',
+            label: targetLang?.nativeName ?? '',
+            text: lastTranslation.translatedText,
+            color: const Color(0xFF4DB6AC),
+            bold: true,
+          ),
+        ],
+      );
+    }
+
+    if (partialText.isNotEmpty) {
+      return _OverlayLine(
+        flag: sourceLang?.flag ?? '',
+        label: sourceLang?.nativeName ?? '',
+        text: partialText,
+        color: Colors.white.withOpacity(0.5),
+      );
+    }
+
+    if (state == PipelineState.listening) {
+      return Center(
+        child: WaveformVisualizer(
+          isActive: true,
+          color: const Color(0xFF4DB6AC),
+          height: 30,
+        ),
+      );
+    }
+
+    return Center(
+      child: Text(
+        l.tapToStart,
+        style: TextStyle(color: Colors.white.withOpacity(0.25), fontSize: 13),
+      ),
+    );
+  }
+
+  Color _stateColor(PipelineState s) {
     return switch (s) {
-      PipelineState.idle => Icons.mic_none,
-      PipelineState.listening => Icons.mic,
-      PipelineState.recognizing => Icons.spatial_audio,
-      PipelineState.translating => Icons.translate,
-      PipelineState.speaking => Icons.volume_up,
+      PipelineState.idle => Colors.white12,
+      PipelineState.listening => const Color(0xFF4FC3F7),
+      PipelineState.recognizing => const Color(0xFFFFB74D),
+      PipelineState.translating => const Color(0xFF81C784),
+      PipelineState.speaking => const Color(0xFFCE93D8),
     };
   }
 
@@ -218,16 +289,16 @@ class _FloatingTranslationOverlayState
   }
 }
 
-class _OverlayText extends StatelessWidget {
-  final String label;
+class _OverlayLine extends StatelessWidget {
   final String flag;
+  final String label;
   final String text;
   final Color color;
   final bool bold;
 
-  const _OverlayText({
-    required this.label,
+  const _OverlayLine({
     required this.flag,
+    required this.label,
     required this.text,
     required this.color,
     this.bold = false,
@@ -246,23 +317,24 @@ class _OverlayText extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               label,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: Theme.of(context).colorScheme.outline,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.35),
+                fontSize: 10,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 2),
-        Flexible(
-          child: Text(
-            text,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: color,
-              fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-            ),
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
+        const SizedBox(height: 4),
+        Text(
+          text,
+          style: TextStyle(
+            color: color,
+            fontSize: bold ? 15 : 13,
+            fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+            height: 1.4,
           ),
+          maxLines: 4,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );

@@ -39,12 +39,15 @@ class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
     state = const ModelDownloadState(status: DownloadStatus.downloading);
     try {
       final manager = _ref.read(modelManagerProvider);
-      await manager.downloadModel(_modelId, onProgress: (p) {
-        state = ModelDownloadState(
-          status: DownloadStatus.downloading,
-          progress: p,
-        );
-      });
+      await manager.downloadModel(
+        _modelId,
+        onProgress: (p) {
+          state = ModelDownloadState(
+            status: DownloadStatus.downloading,
+            progress: p,
+          );
+        },
+      );
       state = const ModelDownloadState(
         status: DownloadStatus.completed,
         progress: 1.0,
@@ -83,6 +86,8 @@ class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
 }
 
 final modelDownloadProvider =
-    StateNotifierProvider.family<ModelDownloadNotifier, ModelDownloadState, String>(
-      (ref, modelId) => ModelDownloadNotifier(modelId, ref),
-    );
+    StateNotifierProvider.family<
+      ModelDownloadNotifier,
+      ModelDownloadState,
+      String
+    >((ref, modelId) => ModelDownloadNotifier(modelId, ref));

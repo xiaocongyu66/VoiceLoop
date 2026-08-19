@@ -16,7 +16,12 @@ class _InitPayload {
   final String tokensPath;
   final String? language;
   final String? vadModelPath;
-  _InitPayload(this.modelPath, this.tokensPath, this.language, this.vadModelPath);
+  _InitPayload(
+    this.modelPath,
+    this.tokensPath,
+    this.language,
+    this.vadModelPath,
+  );
 }
 
 class _TtsInitPayload {
@@ -25,8 +30,13 @@ class _TtsInitPayload {
   final String? lexiconPath;
   final String? dictDirPath;
   final int speakerId;
-  _TtsInitPayload(this.modelPath, this.tokensPath, this.lexiconPath,
-      this.dictDirPath, this.speakerId);
+  _TtsInitPayload(
+    this.modelPath,
+    this.tokensPath,
+    this.lexiconPath,
+    this.dictDirPath,
+    this.speakerId,
+  );
 }
 
 class AudioIsolate {
@@ -38,7 +48,6 @@ class AudioIsolate {
 
   bool get isInitialized => _initialized;
   bool get isTtsInitialized => _ttsInitialized;
-
 
   Future<void> initAsr(
     String modelPath,
@@ -62,11 +71,13 @@ class AudioIsolate {
     _sendPort = await completer.future;
 
     final responsePort = ReceivePort();
-    _sendPort!.send(_IsolateMessage(
-      'initAsr',
-      _InitPayload(modelPath, tokensPath, language, vadModelPath),
-      responsePort.sendPort,
-    ));
+    _sendPort!.send(
+      _IsolateMessage(
+        'initAsr',
+        _InitPayload(modelPath, tokensPath, language, vadModelPath),
+        responsePort.sendPort,
+      ),
+    );
     final result = await responsePort.first;
     if (result == true) {
       _initialized = true;
@@ -86,12 +97,19 @@ class AudioIsolate {
       throw StateError('ASR must be initialized first');
     }
     final responsePort = ReceivePort();
-    _sendPort!.send(_IsolateMessage(
-      'initTts',
-      _TtsInitPayload(
-          modelPath, tokensPath, lexiconPath, dictDirPath, speakerId),
-      responsePort.sendPort,
-    ));
+    _sendPort!.send(
+      _IsolateMessage(
+        'initTts',
+        _TtsInitPayload(
+          modelPath,
+          tokensPath,
+          lexiconPath,
+          dictDirPath,
+          speakerId,
+        ),
+        responsePort.sendPort,
+      ),
+    );
     final result = await responsePort.first;
     if (result == true) {
       _ttsInitialized = true;
@@ -110,7 +128,9 @@ class AudioIsolate {
       throw StateError('AudioIsolate not initialized');
     }
     final responsePort = ReceivePort();
-    _sendPort!.send(_IsolateMessage('recognize', samples, responsePort.sendPort));
+    _sendPort!.send(
+      _IsolateMessage('recognize', samples, responsePort.sendPort),
+    );
     final result = await responsePort.first;
     return result as String;
   }

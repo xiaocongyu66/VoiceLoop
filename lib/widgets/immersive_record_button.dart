@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import 'translation_widgets.dart';
@@ -29,12 +28,7 @@ class ImmersiveRecordButton extends StatelessWidget {
           height: 72,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: RadialGradient(
-              colors: [
-                color,
-                color.withOpacity(0.7),
-              ],
-            ),
+            gradient: RadialGradient(colors: [color, color.withOpacity(0.7)]),
             boxShadow: [
               BoxShadow(
                 color: color.withOpacity(0.4),
@@ -53,11 +47,7 @@ class ImmersiveRecordButton extends StatelessWidget {
                       valueColor: AlwaysStoppedAnimation(Colors.white),
                     ),
                   )
-                : Icon(
-                    icon,
-                    color: Colors.white,
-                    size: 32,
-                  ),
+                : Icon(icon, color: Colors.white, size: 32),
           ),
         ),
       ),

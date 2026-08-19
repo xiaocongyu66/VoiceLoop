@@ -90,11 +90,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 ),
               ),
               const SizedBox(height: 8),
-              ...AsrModels.all().map((m) => _AsrModelCard(
-                    model: m,
-                    isSelected: settings.asrModelId == m.id,
-                    onSelect: () => notifier.updateAsrModel(m.id),
-                  )),
+              ...AsrModels.all().map(
+                (m) => _AsrModelCard(
+                  model: m,
+                  isSelected: settings.asrModelId == m.id,
+                  onSelect: () => notifier.updateAsrModel(m.id),
+                ),
+              ),
               const SizedBox(height: 16),
               Text(
                 l.ttsModel,
@@ -103,11 +105,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 ),
               ),
               const SizedBox(height: 8),
-              ...TtsModels.all().map((m) => _TtsModelCard(
-                    model: m,
-                    isSelected: settings.ttsModelId == m.id,
-                    onSelect: () => notifier.updateTtsModel(m.id),
-                  )),
+              ...TtsModels.all().map(
+                (m) => _TtsModelCard(
+                  model: m,
+                  isSelected: settings.ttsModelId == m.id,
+                  onSelect: () => notifier.updateTtsModel(m.id),
+                ),
+              ),
               const SizedBox(height: 16),
               Text(
                 l.vadModel,
@@ -299,7 +303,13 @@ class _ModelCard extends ConsumerWidget {
           : RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: selectable && isDownloaded ? onSelect : null,
+        onTap: () {
+          if (isDownloaded && selectable) {
+            onSelect();
+          } else if (!isDownloaded && !isDownloading) {
+            notifier.download();
+          }
+        },
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -339,8 +349,13 @@ class _ModelCard extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  _buildActionIcon(context, notifier, isDownloaded,
-                      isDownloading, isFailed),
+                  _buildActionIcon(
+                    context,
+                    notifier,
+                    isDownloaded,
+                    isDownloading,
+                    isFailed,
+                  ),
                 ],
               ),
               const SizedBox(height: 8),

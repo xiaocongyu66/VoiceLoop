@@ -124,9 +124,10 @@ class _PulsingGlowState extends State<PulsingGlow>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     if (widget.isActive) _controller.repeat(reverse: true);
   }
 

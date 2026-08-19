@@ -1,78 +1,90 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 
 class AppTheme {
   const AppTheme._();
 
-  static ThemeData get lightTheme => ThemeData(
+  static ThemeData get lightTheme => FlexColorScheme.light(
+    scheme: FlexScheme.tealM3,
+    surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+    blendLevel: 3,
+    appBarStyle: FlexAppBarStyle.material,
+    appBarOpacity: 0.95,
+    transparentStatusBar: true,
+    tabBarStyle: FlexTabBarStyle.flutterDefault,
+    tooltipsMatchBackground: false,
     useMaterial3: true,
-    colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF00BFA5)),
-    appBarTheme: const AppBarTheme(
-      centerTitle: true,
-      elevation: 0,
-      scrolledUnderElevation: 0,
+    visualDensity: FlexColorScheme.comfortablePlatformDensity,
+    keyColors: const FlexKeyColors(
+      useSecondary: true,
+      useTertiary: true,
+      keepPrimary: true,
     ),
-    cardTheme: CardThemeData(
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    subThemesData: const FlexSubThemesData(
+      interactionEffects: true,
+      blendOnColors: true,
+      blendTextTheme: true,
+      cardRadius: 20,
+      chipRadius: 12,
+      dialogRadius: 24,
+      inputDecoratorRadius: 16,
+      filledButtonRadius: 16,
+      outlinedButtonRadius: 16,
+      textButtonRadius: 16,
+      fabRadius: 20,
+      snackBarRadius: 12,
+      snackBarElevation: 4,
+      drawerRadius: 24,
+      bottomSheetRadius: 28,
+      bottomSheetModalElevation: 8,
+      tooltipRadius: 8,
+      tooltipWaitDuration: Duration(milliseconds: 500),
+      tooltipShowDuration: Duration(seconds: 2),
+      unselectedToggleIsColored: true,
+      appBarScrolledUnderElevation: 2,
     ),
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide.none,
-      ),
-    ),
-    filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        minimumSize: const Size.fromHeight(56),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
-    ),
-  );
+  ).toTheme;
 
-  static ThemeData get darkTheme => ThemeData(
+  static ThemeData get darkTheme => FlexColorScheme.dark(
+    scheme: FlexScheme.tealM3,
+    surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+    blendLevel: 6,
+    appBarStyle: FlexAppBarStyle.material,
+    appBarOpacity: 0.90,
+    transparentStatusBar: true,
+    tabBarStyle: FlexTabBarStyle.flutterDefault,
+    tooltipsMatchBackground: false,
+    darkIsTrueBlack: true,
     useMaterial3: true,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF6200EA),
-      brightness: Brightness.dark,
+    visualDensity: FlexColorScheme.comfortablePlatformDensity,
+    keyColors: const FlexKeyColors(
+      useSecondary: true,
+      useTertiary: true,
+      keepPrimary: true,
+      keepSecondary: true,
     ),
-    appBarTheme: const AppBarTheme(
-      centerTitle: true,
-      elevation: 0,
-      scrolledUnderElevation: 0,
+    subThemesData: const FlexSubThemesData(
+      interactionEffects: true,
+      blendOnColors: true,
+      blendTextTheme: true,
+      cardRadius: 20,
+      chipRadius: 12,
+      dialogRadius: 24,
+      inputDecoratorRadius: 16,
+      filledButtonRadius: 16,
+      outlinedButtonRadius: 16,
+      textButtonRadius: 16,
+      fabRadius: 20,
+      snackBarRadius: 12,
+      snackBarElevation: 4,
+      drawerRadius: 24,
+      bottomSheetRadius: 28,
+      bottomSheetModalElevation: 8,
+      tooltipRadius: 8,
+      tooltipWaitDuration: Duration(milliseconds: 500),
+      tooltipShowDuration: Duration(seconds: 2),
+      unselectedToggleIsColored: true,
+      appBarScrolledUnderElevation: 2,
     ),
-    cardTheme: CardThemeData(
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide.none,
-      ),
-    ),
-    filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        minimumSize: const Size.fromHeight(56),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
-    ),
-  );
+  ).toTheme;
 }

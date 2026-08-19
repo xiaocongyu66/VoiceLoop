@@ -16,7 +16,12 @@ class _InitPayload {
   final String tokensPath;
   final String? language;
   final String? vadModelPath;
-  _InitPayload(this.modelPath, this.tokensPath, this.language, this.vadModelPath);
+  _InitPayload(
+    this.modelPath,
+    this.tokensPath,
+    this.language,
+    this.vadModelPath,
+  );
 }
 
 class AsrIsolate {
@@ -49,11 +54,13 @@ class AsrIsolate {
     _sendPort = await completer.future;
 
     final responsePort = ReceivePort();
-    _sendPort!.send(_IsolateMessage(
-      'init',
-      _InitPayload(modelPath, tokensPath, language, vadModelPath),
-      responsePort.sendPort,
-    ));
+    _sendPort!.send(
+      _IsolateMessage(
+        'init',
+        _InitPayload(modelPath, tokensPath, language, vadModelPath),
+        responsePort.sendPort,
+      ),
+    );
     final result = await responsePort.first;
     if (result == true) {
       _initialized = true;
@@ -67,7 +74,9 @@ class AsrIsolate {
       throw StateError('AsrIsolate not initialized');
     }
     final responsePort = ReceivePort();
-    _sendPort!.send(_IsolateMessage('recognize', samples, responsePort.sendPort));
+    _sendPort!.send(
+      _IsolateMessage('recognize', samples, responsePort.sendPort),
+    );
     final result = await responsePort.first;
     return result as String;
   }

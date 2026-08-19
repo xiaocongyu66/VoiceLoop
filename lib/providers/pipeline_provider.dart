@@ -15,7 +15,9 @@ export '../services/audio_pipeline.dart' show PipelineState;
 
 final partialTextProvider = StateProvider<String>((ref) => '');
 
-final lastTranslationProvider = StateProvider<TranslationResult?>((ref) => null);
+final lastTranslationProvider = StateProvider<TranslationResult?>(
+  (ref) => null,
+);
 
 final pipelineErrorProvider = StateProvider<String?>((ref) => null);
 
@@ -31,9 +33,7 @@ class PipelineStateNotifier extends StateNotifier<PipelineState> {
 
   AudioPipeline get _pipelineInstance {
     if (_pipeline != null) return _pipeline!;
-    _pipeline = AudioPipeline(
-      audioIsolate: _ref.read(audioIsolateProvider),
-    );
+    _pipeline = AudioPipeline(audioIsolate: _ref.read(audioIsolateProvider));
     _stateSub = _pipeline!.stateStream.listen((s) {
       if (mounted) state = s;
     });

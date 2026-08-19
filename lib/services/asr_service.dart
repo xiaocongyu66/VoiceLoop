@@ -22,7 +22,10 @@ class AsrService {
     );
   }
 
-  Future<String> recognize(Float32List samples, {int sampleRate = 16000}) async {
+  Future<String> recognize(
+    Float32List samples, {
+    int sampleRate = 16000,
+  }) async {
     if (!_isolate.isInitialized) {
       throw StateError('AsrService not initialized');
     }
