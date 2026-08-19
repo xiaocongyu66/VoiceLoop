@@ -3,8 +3,6 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:archive/archive.dart' as archive;
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,11 +25,9 @@ enum DownloadMirror {
 class ModelManager {
   static const _modelDirName = 'models';
   static const _prefMirrorKey = 'download_mirror';
-  static const _platform = MethodChannel('com.voiceloop.model_extract');
 
   HttpClient? _httpClient;
   bool _cancelRequested = false;
-  String? _currentModelId;
   DownloadMirror _mirror = DownloadMirror.hfMirror;
 
   DownloadMirror get mirror => _mirror;
@@ -127,7 +123,6 @@ class ModelManager {
   }
 
   Future<void> downloadModel(String modelId, {void Function(double progress)? onProgress}) async {
-    _currentModelId = modelId;
     _cancelRequested = false;
 
     final alreadyDownloaded = await isModelDownloaded(modelId);

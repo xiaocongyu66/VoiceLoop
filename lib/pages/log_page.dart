@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/utils/logger.dart';
-import '../l10n/app_localizations.dart';
 
 final logUpdateProvider = StateProvider<int>((ref) => 0);
 
