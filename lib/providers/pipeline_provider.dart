@@ -32,9 +32,7 @@ class PipelineStateNotifier extends StateNotifier<PipelineState> {
   AudioPipeline get _pipelineInstance {
     if (_pipeline != null) return _pipeline!;
     _pipeline = AudioPipeline(
-      asrService: _ref.read(asrServiceProvider),
-      vadService: _ref.read(vadServiceProvider),
-      ttsService: _ref.read(ttsServiceProvider),
+      audioIsolate: _ref.read(audioIsolateProvider),
     );
     _stateSub = _pipeline!.stateStream.listen((s) {
       if (mounted) state = s;
@@ -104,7 +102,7 @@ class PipelineStateNotifier extends StateNotifier<PipelineState> {
         final ttsModel = TtsModels.byId(ttsModelId);
         if (ttsModel != null) {
           final ttsModelDir = await modelManager.getModelPath(ttsModelId);
-          ttsService.init(
+          await ttsService.init(
             p.join(ttsModelDir, ttsModel.modelFileName),
             p.join(ttsModelDir, ttsModel.tokensFileName),
             lexiconPath: ttsModel.lexiconPath != null

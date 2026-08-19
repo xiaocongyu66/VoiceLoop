@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import '../models/translation_result.dart';
-import 'asr_service.dart';
+import 'audio_isolate.dart';
 import 'audio_recorder_service.dart';
-import 'tts_service.dart';
-import 'vad_service.dart';
 
 enum PipelineState { idle, listening, recognizing, translating, speaking }
 
@@ -16,9 +14,7 @@ typedef TtsCallback =
     Future<Float32List> Function(String text, String targetLang);
 
 class AudioPipeline {
-  final AsrService asrService;
-  final VadService vadService;
-  final TtsService ttsService;
+  final AudioIsolate audioIsolate;
   AudioRecorderService? _recorder;
 
   final StreamController<PipelineState> _stateController =
@@ -34,6 +30,8 @@ class AudioPipeline {
       StreamController<String>.broadcast();
 
   final List<double> _buffer = [];
+  static const int _chunkSize = 512;
+  static const int _minSegmentSize = 3200;
 
   PipelineState _state = PipelineState.idle;
   bool _running = false;
@@ -42,11 +40,7 @@ class AudioPipeline {
   TranslationCallback? onTranslate;
   TtsCallback? onSynthesize;
 
-  AudioPipeline({
-    required this.asrService,
-    required this.vadService,
-    required this.ttsService,
-  });
+  AudioPipeline({required this.audioIsolate});
 
   PipelineState get state => _state;
 
@@ -76,40 +70,31 @@ class AudioPipeline {
     _recorder ??= AudioRecorderService();
     await _recorder!.start();
     _audioSub = _recorder!.audioStream.listen((samples) {
-      _processAudioChunk(samples, sourceLang, targetLang);
+      _processAudio(samples, sourceLang, targetLang);
     });
   }
 
-  void _processAudioChunk(
+  void _processAudio(
     Float32List samples,
     String sourceLang,
     String targetLang,
   ) {
     if (!_running) return;
 
+    audioIsolate.feedAudio(samples);
+
     _buffer.addAll(samples);
 
-    const int chunkSize = 512;
-    while (_buffer.length >= chunkSize) {
-      final chunk = Float32List.fromList(_buffer.sublist(0, chunkSize));
-      _buffer.removeRange(0, chunkSize);
+    while (_buffer.length >= _chunkSize) {
+      final chunk = Float32List.fromList(
+        _buffer.sublist(0, _chunkSize),
+      );
+      _buffer.removeRange(0, _chunkSize);
 
-      if (vadService.isInitialized) {
-        vadService.acceptWaveform(chunk);
-        vadService.flush();
-        while (!vadService.isEmpty()) {
-          final segment = vadService.front();
-          if (segment.samples.isNotEmpty) {
-            _handleSpeechSegment(
-              Float32List.fromList(segment.samples),
-              sourceLang,
-              targetLang,
-            );
-          }
-          vadService.clear();
-        }
-      } else {
-        _handleSpeechSegment(chunk, sourceLang, targetLang);
+      if (_buffer.length >= _minSegmentSize || !_running) {
+        final segment = Float32List.fromList(_buffer);
+        _buffer.clear();
+        _handleSpeechSegment(segment, sourceLang, targetLang);
       }
     }
   }
@@ -119,19 +104,20 @@ class AudioPipeline {
     String sourceLang,
     String targetLang,
   ) async {
+    if (!_running) return;
     _setState(PipelineState.recognizing);
 
     String text = '';
     try {
-      text = await asrService.recognize(speech);
-    } catch (e) {
+      text = await audioIsolate.recognizeSegment(speech);
+    } catch (_) {
       _errorController.add('recognitionFailed');
-      _setState(PipelineState.listening);
+      if (_running) _setState(PipelineState.listening);
       return;
     }
 
     if (text.isEmpty) {
-      _setState(PipelineState.listening);
+      if (_running) _setState(PipelineState.listening);
       return;
     }
 
@@ -144,7 +130,7 @@ class AudioPipeline {
         translated = await onTranslate!(text, sourceLang, targetLang);
       } catch (e) {
         _errorController.add('translationFailed');
-        translated = '[Translation failed: $e]';
+        translated = '[Translation failed]';
       }
 
       final result = TranslationResult(
@@ -160,7 +146,7 @@ class AudioPipeline {
         _setState(PipelineState.speaking);
         try {
           await onSynthesize!(translated, targetLang);
-        } catch (e) {
+        } catch (_) {
           _errorController.add('ttsFailed');
         }
       }

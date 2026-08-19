@@ -1,9 +1,10 @@
 import 'dart:typed_data';
 
-import 'asr_isolate.dart';
+import 'audio_isolate.dart';
 
 class AsrService {
-  final AsrIsolate _isolate = AsrIsolate();
+  final AudioIsolate _isolate;
+  AsrService(this._isolate);
 
   bool get isInitialized => _isolate.isInitialized;
 
@@ -13,7 +14,7 @@ class AsrService {
     String? language,
     String? vadModelPath,
   }) async {
-    await _isolate.init(
+    await _isolate.initAsr(
       modelPath,
       tokensPath,
       language: language,
@@ -25,10 +26,8 @@ class AsrService {
     if (!_isolate.isInitialized) {
       throw StateError('AsrService not initialized');
     }
-    return await _isolate.recognize(samples);
+    return await _isolate.recognizeSegment(samples);
   }
 
-  void dispose() {
-    _isolate.dispose();
-  }
+  void dispose() {}
 }

@@ -1,53 +1,35 @@
 import 'dart:typed_data';
 
-import 'package:sherpa_onnx/sherpa_onnx.dart' as sherpa;
+import 'audio_isolate.dart';
 
 class TtsService {
-  sherpa.OfflineTts? _tts;
-  int _speakerId = 0;
+  final AudioIsolate _isolate;
+  TtsService(this._isolate);
 
-  bool get isInitialized => _tts != null;
+  bool get isInitialized => _isolate.isTtsInitialized;
 
-  void init(
+  Future<void> init(
     String modelPath,
     String tokensPath, {
     String? lexiconPath,
     String? dictDirPath,
     int speakerId = 0,
-  }) {
-    final config = sherpa.OfflineTtsConfig(
-      model: sherpa.OfflineTtsModelConfig(
-        vits: sherpa.OfflineTtsVitsModelConfig(
-          model: modelPath,
-          lexicon: lexiconPath ?? '',
-          tokens: tokensPath,
-          dictDir: dictDirPath ?? '',
-        ),
-        numThreads: 2,
-        debug: false,
-        provider: 'cpu',
-      ),
+  }) async {
+    await _isolate.initTts(
+      modelPath,
+      tokensPath,
+      lexiconPath: lexiconPath,
+      dictDirPath: dictDirPath,
+      speakerId: speakerId,
     );
-    _tts = sherpa.OfflineTts(config);
-    _speakerId = speakerId;
   }
 
-  Float32List synthesize(String text) {
-    if (_tts == null) {
+  Future<Float32List> synthesize(String text) async {
+    if (!_isolate.isTtsInitialized) {
       throw StateError('TtsService not initialized');
     }
-    final result = _tts!.generate(text: text, sid: _speakerId, speed: 1.0);
-    return result.samples;
+    return await _isolate.synthesize(text);
   }
 
-  int get sampleRate {
-    if (_tts == null) return 0;
-    final result = _tts!.generate(text: '', sid: _speakerId, speed: 1.0);
-    return result.sampleRate;
-  }
-
-  void dispose() {
-    _tts?.free();
-    _tts = null;
-  }
+  void dispose() {}
 }
