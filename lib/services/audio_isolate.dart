@@ -39,7 +39,6 @@ class AudioIsolate {
   bool get isInitialized => _initialized;
   bool get isTtsInitialized => _ttsInitialized;
 
-  final _buffer = <double>[];
 
   Future<void> initAsr(
     String modelPath,

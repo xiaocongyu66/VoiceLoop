@@ -86,9 +86,6 @@ class AudioPipeline {
     _buffer.addAll(samples);
 
     while (_buffer.length >= _chunkSize) {
-      final chunk = Float32List.fromList(
-        _buffer.sublist(0, _chunkSize),
-      );
       _buffer.removeRange(0, _chunkSize);
 
       if (_buffer.length >= _minSegmentSize || !_running) {

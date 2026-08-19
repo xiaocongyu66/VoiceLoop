@@ -66,7 +66,6 @@ class ImmersiveTranslationView extends StatelessWidget {
     bool hasPartial,
     bool isActive,
   ) {
-    final theme = Theme.of(context);
     final sourceText = hasResult
         ? result!.originalText
         : (hasPartial ? partialText! : '');

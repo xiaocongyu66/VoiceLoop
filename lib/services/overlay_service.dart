@@ -59,7 +59,6 @@ class _FloatingTranslationOverlayState
     final pipelineState = ref.watch(pipelineStateProvider);
     final partialText = ref.watch(partialTextProvider);
     final lastTranslation = ref.watch(lastTranslationProvider);
-    final screen = MediaQuery.of(context).size;
 
     final sourceLang = AppLanguages.byCode(settings.sourceLanguage);
     final targetLang = AppLanguages.byCode(settings.targetLanguage);
