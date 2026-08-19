@@ -1,47 +1,36 @@
 import 'dart:typed_data';
 
-import 'package:sherpa_onnx/sherpa_onnx.dart' as sherpa;
+import 'audio_isolate.dart';
 
 class AsrService {
-  sherpa.OfflineRecognizer? _recognizer;
+  final AudioIsolate _isolate;
+  AsrService(this._isolate);
 
-  bool get isInitialized => _recognizer != null;
+  bool get isInitialized => _isolate.isInitialized;
 
-  void init(
+  Future<void> init(
     String modelPath,
     String tokensPath, {
     String? language,
-  }) {
-    final config = sherpa.OfflineRecognizerConfig(
-      model: sherpa.OfflineModelConfig(
-        tokens: tokensPath,
-        senseVoice: sherpa.OfflineSenseVoiceModelConfig(
-          model: modelPath,
-          language: language ?? 'auto',
-          useInverseTextNormalization: true,
-        ),
-        numThreads: 2,
-        debug: false,
-        provider: 'cpu',
-      ),
+    String? vadModelPath,
+  }) async {
+    await _isolate.initAsr(
+      modelPath,
+      tokensPath,
+      language: language,
+      vadModelPath: vadModelPath,
     );
-    _recognizer = sherpa.OfflineRecognizer(config);
   }
 
-  String recognize(Float32List samples, {int sampleRate = 16000}) {
-    if (_recognizer == null) {
+  Future<String> recognize(
+    Float32List samples, {
+    int sampleRate = 16000,
+  }) async {
+    if (!_isolate.isInitialized) {
       throw StateError('AsrService not initialized');
     }
-    final stream = _recognizer!.createStream();
-    stream.acceptWaveform(samples: samples, sampleRate: sampleRate);
-    _recognizer!.decode(stream);
-    final result = _recognizer!.getResult(stream);
-    stream.free();
-    return result.text;
+    return await _isolate.recognizeSegment(samples);
   }
 
-  void dispose() {
-    _recognizer?.free();
-    _recognizer = null;
-  }
+  void dispose() {}
 }

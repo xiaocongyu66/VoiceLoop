@@ -10,11 +10,7 @@ class RecordButton extends StatefulWidget {
   final RecordButtonState state;
   final VoidCallback onPressed;
 
-  const RecordButton({
-    super.key,
-    required this.state,
-    required this.onPressed,
-  });
+  const RecordButton({super.key, required this.state, required this.onPressed});
 
   @override
   State<RecordButton> createState() => _RecordButtonState();
@@ -78,10 +74,7 @@ class _RecordButtonState extends State<RecordButton>
                   final opacity = 0.5 * (1.0 - t);
                   return Transform.scale(
                     scale: scale,
-                    child: Opacity(
-                      opacity: opacity,
-                      child: child,
-                    ),
+                    child: Opacity(opacity: opacity, child: child),
                   );
                 },
                 child: Container(
@@ -89,7 +82,7 @@ class _RecordButtonState extends State<RecordButton>
                   height: size + 32,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: color.withValues(alpha: 0.15),
+                    color: color.withOpacity(0.15),
                   ),
                 ),
               ),
@@ -98,7 +91,7 @@ class _RecordButtonState extends State<RecordButton>
               height: size + 16,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: color.withValues(alpha: 0.2),
+                color: color.withOpacity(0.2),
               ),
             ),
           ],
@@ -112,11 +105,11 @@ class _RecordButtonState extends State<RecordButton>
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [color, color.withValues(alpha: 0.7)],
+                colors: [color, color.withOpacity(0.7)],
               ),
               boxShadow: [
                 BoxShadow(
-                  color: color.withValues(alpha: 0.4),
+                  color: color.withOpacity(0.4),
                   blurRadius: 20,
                   offset: const Offset(0, 6),
                 ),
@@ -125,14 +118,14 @@ class _RecordButtonState extends State<RecordButton>
             child: widget.state == RecordButtonState.recording
                 ? _WaveformIndicator(color: Colors.white)
                 : widget.state == RecordButtonState.recognizing
-                    ? Padding(
-                        padding: const EdgeInsets.all(18),
-                        child: CircularProgressIndicator(
-                          strokeWidth: 3,
-                          valueColor: AlwaysStoppedAnimation(Colors.white),
-                        ),
-                      )
-                    : Icon(icon, color: Colors.white, size: 32),
+                ? Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      valueColor: AlwaysStoppedAnimation(Colors.white),
+                    ),
+                  )
+                : Icon(icon, color: Colors.white, size: 32),
           ),
         ],
       ),
@@ -210,7 +203,7 @@ class _WaveformIndicatorState extends State<_WaveformIndicator>
               width: 4,
               height: h,
               decoration: BoxDecoration(
-                color: widget.color.withValues(alpha: 0.8),
+                color: widget.color.withOpacity(0.8),
                 borderRadius: BorderRadius.circular(2),
               ),
             );

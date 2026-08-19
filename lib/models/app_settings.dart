@@ -37,7 +37,9 @@ class AppSettings {
       sourceLanguage: sourceLanguage ?? this.sourceLanguage,
       targetLanguage: targetLanguage ?? this.targetLanguage,
       asrModelId: asrModelId ?? this.asrModelId,
-      ttsModelId: ttsModelId == _sentinel ? this.ttsModelId : ttsModelId as String?,
+      ttsModelId: ttsModelId == _sentinel
+          ? this.ttsModelId
+          : ttsModelId as String?,
       translationEngine: translationEngine ?? this.translationEngine,
       autoTranslate: autoTranslate ?? this.autoTranslate,
       autoSpeak: autoSpeak ?? this.autoSpeak,

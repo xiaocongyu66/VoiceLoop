@@ -2,29 +2,20 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import '../models/translation_result.dart';
-import 'asr_service.dart';
+import 'audio_isolate.dart';
 import 'audio_recorder_service.dart';
-import 'tts_service.dart';
-import 'vad_service.dart';
 
 enum PipelineState { idle, listening, recognizing, translating, speaking }
 
-typedef TranslationCallback = Future<String> Function(
-  String text,
-  String sourceLang,
-  String targetLang,
-);
+typedef TranslationCallback =
+    Future<String> Function(String text, String sourceLang, String targetLang);
 
-typedef TtsCallback = Future<Float32List> Function(
-  String text,
-  String targetLang,
-);
+typedef TtsCallback =
+    Future<Float32List> Function(String text, String targetLang);
 
 class AudioPipeline {
-  final AsrService asrService;
-  final VadService vadService;
-  final TtsService ttsService;
-  final AudioRecorderService _recorder = AudioRecorderService();
+  final AudioIsolate audioIsolate;
+  AudioRecorderService? _recorder;
 
   final StreamController<PipelineState> _stateController =
       StreamController<PipelineState>.broadcast();
@@ -35,7 +26,12 @@ class AudioPipeline {
   final StreamController<TranslationResult> _translationController =
       StreamController<TranslationResult>.broadcast();
 
+  final StreamController<String> _errorController =
+      StreamController<String>.broadcast();
+
   final List<double> _buffer = [];
+  static const int _chunkSize = 512;
+  static const int _minSegmentSize = 3200;
 
   PipelineState _state = PipelineState.idle;
   bool _running = false;
@@ -44,11 +40,7 @@ class AudioPipeline {
   TranslationCallback? onTranslate;
   TtsCallback? onSynthesize;
 
-  AudioPipeline({
-    required this.asrService,
-    required this.vadService,
-    required this.ttsService,
-  });
+  AudioPipeline({required this.audioIsolate});
 
   PipelineState get state => _state;
 
@@ -58,6 +50,8 @@ class AudioPipeline {
 
   Stream<TranslationResult> get translationStream =>
       _translationController.stream;
+
+  Stream<String> get errorStream => _errorController.stream;
 
   void _setState(PipelineState newState) {
     _state = newState;
@@ -73,40 +67,31 @@ class AudioPipeline {
 
     _setState(PipelineState.listening);
 
-    await _recorder.start();
-    _audioSub = _recorder.audioStream.listen((samples) {
-      _processAudioChunk(samples, sourceLang, targetLang);
+    _recorder ??= AudioRecorderService();
+    await _recorder!.start();
+    _audioSub = _recorder!.audioStream.listen((samples) {
+      _processAudio(samples, sourceLang, targetLang);
     });
   }
 
-  void _processAudioChunk(
+  void _processAudio(
     Float32List samples,
     String sourceLang,
     String targetLang,
   ) {
     if (!_running) return;
 
+    audioIsolate.feedAudio(samples);
+
     _buffer.addAll(samples);
 
-    const int chunkSize = 512;
-    while (_buffer.length >= chunkSize) {
-      final chunk = Float32List.fromList(
-        _buffer.sublist(0, chunkSize),
-      );
-      _buffer.removeRange(0, chunkSize);
+    while (_buffer.length >= _chunkSize) {
+      _buffer.removeRange(0, _chunkSize);
 
-      vadService.acceptWaveform(chunk);
-      vadService.flush();
-      while (!vadService.isEmpty()) {
-        final segment = vadService.front();
-        if (segment.samples.isNotEmpty) {
-          _handleSpeechSegment(
-            segment.samples,
-            sourceLang,
-            targetLang,
-          );
-        }
-        vadService.clear();
+      if (_buffer.length >= _minSegmentSize || !_running) {
+        final segment = Float32List.fromList(_buffer);
+        _buffer.clear();
+        _handleSpeechSegment(segment, sourceLang, targetLang);
       }
     }
   }
@@ -116,11 +101,20 @@ class AudioPipeline {
     String sourceLang,
     String targetLang,
   ) async {
+    if (!_running) return;
     _setState(PipelineState.recognizing);
 
-    final text = asrService.recognize(speech);
+    String text = '';
+    try {
+      text = await audioIsolate.recognizeSegment(speech);
+    } catch (_) {
+      _errorController.add('recognitionFailed');
+      if (_running) _setState(PipelineState.listening);
+      return;
+    }
+
     if (text.isEmpty) {
-      _setState(PipelineState.listening);
+      if (_running) _setState(PipelineState.listening);
       return;
     }
 
@@ -128,7 +122,13 @@ class AudioPipeline {
 
     if (onTranslate != null) {
       _setState(PipelineState.translating);
-      final translated = await onTranslate!(text, sourceLang, targetLang);
+      String translated;
+      try {
+        translated = await onTranslate!(text, sourceLang, targetLang);
+      } catch (e) {
+        _errorController.add('translationFailed');
+        translated = '[Translation failed]';
+      }
 
       final result = TranslationResult(
         originalText: text,
@@ -141,7 +141,11 @@ class AudioPipeline {
 
       if (onSynthesize != null) {
         _setState(PipelineState.speaking);
-        await onSynthesize!(translated, targetLang);
+        try {
+          await onSynthesize!(translated, targetLang);
+        } catch (_) {
+          _errorController.add('ttsFailed');
+        }
       }
     }
 
@@ -150,11 +154,15 @@ class AudioPipeline {
     }
   }
 
+  void emitError(String error) {
+    _errorController.add(error);
+  }
+
   Future<void> stop() async {
     _running = false;
     await _audioSub?.cancel();
     _audioSub = null;
-    await _recorder.stop();
+    await _recorder?.stop();
     _buffer.clear();
     _setState(PipelineState.idle);
   }
@@ -164,6 +172,7 @@ class AudioPipeline {
     await _stateController.close();
     await _partialTextController.close();
     await _translationController.close();
-    await _recorder.dispose();
+    await _errorController.close();
+    await _recorder?.dispose();
   }
 }

@@ -19,7 +19,9 @@ class VadService {
       ),
     );
     _vad = sherpa.VoiceActivityDetector(
-        config: config, bufferSizeInSeconds: 30.0);
+      config: config,
+      bufferSizeInSeconds: 30.0,
+    );
   }
 
   void acceptWaveform(Float32List samples) {

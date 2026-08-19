@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/constants/languages.dart';
 import '../core/extensions/context_extensions.dart';
+
 import '../providers/pipeline_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/record_button.dart' as rb;
@@ -31,15 +32,12 @@ class MirrorPage extends ConsumerWidget {
               child: _MirrorHalf(
                 flag: sourceLang?.flag ?? '🌐',
                 langName: sourceLang?.nativeName ?? settings.sourceLanguage,
-                originalText: lastTranslation?.originalText ?? partialText ?? '',
+                originalText: lastTranslation?.originalText ?? partialText,
                 translatedText: lastTranslation?.translatedText ?? '',
                 isSource: true,
               ),
             ),
-            Container(
-              height: 1,
-              color: context.colorScheme.outlineVariant,
-            ),
+            Container(height: 1, color: context.colorScheme.outlineVariant),
             Expanded(
               child: Transform.rotate(
                 angle: pi,
@@ -111,7 +109,9 @@ class _MirrorHalf extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: isSource ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+        crossAxisAlignment: isSource
+            ? CrossAxisAlignment.start
+            : CrossAxisAlignment.end,
         children: [
           Row(
             mainAxisSize: MainAxisSize.min,

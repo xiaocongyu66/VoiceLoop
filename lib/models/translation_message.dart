@@ -31,7 +31,9 @@ class TranslationMessage {
         translatedText: json['translatedText'] as String,
         sourceLang: json['sourceLang'] as String,
         targetLang: json['targetLang'] as String,
-        timestamp: DateTime.fromMillisecondsSinceEpoch(json['timestamp'] as int),
+        timestamp: DateTime.fromMillisecondsSinceEpoch(
+          json['timestamp'] as int,
+        ),
         direction: (json['direction'] as int) == 0
             ? MessageDirection.incoming
             : MessageDirection.outgoing,
@@ -39,21 +41,20 @@ class TranslationMessage {
       );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'sessionId': sessionId,
-        'originalText': originalText,
-        'translatedText': translatedText,
-        'sourceLang': sourceLang,
-        'targetLang': targetLang,
-        'timestamp': timestamp.millisecondsSinceEpoch,
-        'direction': direction == MessageDirection.incoming ? 0 : 1,
-        'audioPath': audioPath,
-      };
+    'id': id,
+    'sessionId': sessionId,
+    'originalText': originalText,
+    'translatedText': translatedText,
+    'sourceLang': sourceLang,
+    'targetLang': targetLang,
+    'timestamp': timestamp.millisecondsSinceEpoch,
+    'direction': direction == MessageDirection.incoming ? 0 : 1,
+    'audioPath': audioPath,
+  };
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TranslationMessage && other.id == id;
+      identical(this, other) || other is TranslationMessage && other.id == id;
 
   @override
   int get hashCode => id.hashCode;

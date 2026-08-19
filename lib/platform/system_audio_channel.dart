@@ -6,10 +6,12 @@ import 'package:flutter/services.dart';
 import '../core/utils/logger.dart';
 
 class SystemAudioChannel {
-  static const MethodChannel _channel =
-      MethodChannel('com.voiceloop.system_audio');
-  static const EventChannel _streamChannel =
-      EventChannel('com.voiceloop.system_audio_stream');
+  static const MethodChannel _channel = MethodChannel(
+    'com.voiceloop.system_audio',
+  );
+  static const EventChannel _streamChannel = EventChannel(
+    'com.voiceloop.system_audio_stream',
+  );
 
   Stream<Float32List>? _audioStream;
 
@@ -41,8 +43,7 @@ class SystemAudioChannel {
           if (event is List) {
             return Float32List.fromList(event.cast<double>());
           }
-          throw const FormatException(
-              'Unexpected audio stream event type');
+          throw const FormatException('Unexpected audio stream event type');
         })
         .handleError((Object error) {
           Logger.e('audioStream error: $error');

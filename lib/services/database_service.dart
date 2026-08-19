@@ -60,8 +60,7 @@ class AppDatabase {
         .toList();
   }
 
-  Future<List<TranslationMessage>> getSessionMessages(
-      String sessionId) async {
+  Future<List<TranslationMessage>> getSessionMessages(String sessionId) async {
     if (_messagesDb == null) await init();
     final raw = jsonDecode(_messagesDb!.readAsStringSync()) as List;
     return raw

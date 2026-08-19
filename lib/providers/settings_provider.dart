@@ -18,7 +18,8 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       asrModelId: p.getString('${_prefix}asrModelId') ?? 'sensevoice-small',
       ttsModelId: p.getString('${_prefix}ttsModelId'),
       translationEngine: TranslationEngine.values.firstWhere(
-        (e) => e.name == (p.getString('${_prefix}translationEngine') ?? 'mlKit'),
+        (e) =>
+            e.name == (p.getString('${_prefix}translationEngine') ?? 'mlKit'),
         orElse: () => TranslationEngine.mlKit,
       ),
       autoTranslate: p.getBool('${_prefix}autoTranslate') ?? true,
@@ -36,7 +37,10 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     if (state.ttsModelId != null) {
       await prefs.setString('${_prefix}ttsModelId', state.ttsModelId!);
     }
-    await prefs.setString('${_prefix}translationEngine', state.translationEngine.name);
+    await prefs.setString(
+      '${_prefix}translationEngine',
+      state.translationEngine.name,
+    );
     await prefs.setBool('${_prefix}autoTranslate', state.autoTranslate);
     await prefs.setBool('${_prefix}autoSpeak', state.autoSpeak);
     await prefs.setBool('${_prefix}mirrorMode', state.mirrorMode);
@@ -72,6 +76,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _persist();
   }
 
+  Future<void> updateTtsModel(String? modelId) async {
+    state = state.copyWith(ttsModelId: modelId);
+    await _persist();
+  }
+
   Future<void> updateTranslationEngine(TranslationEngine engine) async {
     state = state.copyWith(translationEngine: engine);
     await _persist();
@@ -86,7 +95,6 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   }
 }
 
-final settingsProvider =
-    StateNotifierProvider<SettingsNotifier, AppSettings>(
+final settingsProvider = StateNotifierProvider<SettingsNotifier, AppSettings>(
   (ref) => SettingsNotifier(),
 );

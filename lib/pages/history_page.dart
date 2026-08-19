@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../core/constants/languages.dart';
 import '../core/extensions/context_extensions.dart';
+import '../l10n/app_localizations.dart';
 import '../providers/session_provider.dart';
 import '../widgets/empty_state.dart';
 
@@ -12,21 +13,22 @@ class HistoryPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLoc.of(context)!;
     final sessions = ref.watch(sessionProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('历史会话'),
+        title: Text(l.history),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => context.go('/'),
         ),
       ),
       body: sessions.isEmpty
-          ? const EmptyState(
+          ? EmptyState(
               icon: Icons.history_rounded,
-              title: '暂无历史会话',
-              subtitle: '开始录音后，翻译记录会出现在这里',
+              title: l.historyEmpty,
+              subtitle: l.historyEmptyHint,
             )
           : ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -42,7 +44,10 @@ class HistoryPage extends ConsumerWidget {
                   curve: Curves.easeOut,
                   child: Card(
                     child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       title: Text(
                         session.title,
                         style: context.textTheme.titleMedium?.copyWith(
@@ -57,10 +62,12 @@ class HistoryPage extends ConsumerWidget {
                           const SizedBox(height: 4),
                           Row(
                             children: [
-                              Text('${sourceLang?.flag ?? '🌐'} → ${targetLang?.flag ?? '🌐'}'),
+                              Text(
+                                '${sourceLang?.flag ?? '🌐'} → ${targetLang?.flag ?? '🌐'}',
+                              ),
                               const SizedBox(width: 8),
                               Text(
-                                '${session.messages.length} 条消息',
+                                '${session.messages.length} ${l.messages}',
                                 style: context.textTheme.bodySmall?.copyWith(
                                   color: context.colorScheme.outline,
                                 ),
