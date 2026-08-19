@@ -1,17 +1,16 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/constants/languages.dart';
 import '../l10n/app_localizations.dart';
+import '../models/app_settings.dart';
 import '../providers/pipeline_provider.dart';
 import '../providers/settings_provider.dart';
 import '../services/overlay_service.dart';
-import '../widgets/language_selector.dart';
-import '../widgets/record_button.dart' as rb;
-import '../widgets/translation_card.dart';
+import '../widgets/immersive_record_button.dart';
+import '../widgets/immersive_translation_view.dart';
+import '../widgets/translation_widgets.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -26,67 +25,45 @@ class HomePage extends ConsumerWidget {
     final settingsNotifier = ref.read(settingsProvider.notifier);
     final overlayService = ref.read(overlayProvider);
 
-    final buttonState = _mapState(pipelineState);
     final sourceLang = AppLanguages.byCode(settings.sourceLanguage);
     final targetLang = AppLanguages.byCode(settings.targetLanguage);
 
+    final displayState = _mapState(pipelineState);
+    final buttonState = _mapButtonState(pipelineState);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l.appTitle),
-        actions: [
-          IconButton(
-            icon: Icon(
-              overlayService.isVisible ? Icons.close_fullscreen : Icons.picture_in_picture,
-            ),
-            onPressed: () => overlayService.toggle(context, ref),
+      extendBodyBehindAppBar: true,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF0A0E21)
+                  : const Color(0xFF1A1A2E),
+              Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF0D1117)
+                  : const Color(0xFF16213E),
+            ],
           ),
-          IconButton(
-            icon: const Icon(Icons.history_rounded),
-            onPressed: () => context.go('/history'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_rounded),
-            onPressed: () => context.go('/settings'),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+        ),
+        child: SafeArea(
           child: Column(
             children: [
+              _buildTopBar(context, l, ref, overlayService),
               const SizedBox(height: 8),
-              Expanded(
-                flex: 3,
-                child: Center(
-                  child: SingleChildScrollView(
-                    child: TranslationCard(
-                      result: lastTranslation,
-                      partialText: partialText,
-                    ),
-                  ),
-                ),
-              ),
-              const Spacer(),
-              _LanguageBar(
+              ImmersiveTranslationView(
+                result: lastTranslation,
+                partialText: partialText,
+                state: displayState,
                 sourceLang: sourceLang,
                 targetLang: targetLang,
-                onSourceChanged: (lang) {
-                  if (lang != null) {
-                    settingsNotifier.updateSourceLang(lang.code.name);
-                  }
-                },
-                onTargetChanged: (lang) {
-                  if (lang != null) {
-                    settingsNotifier.updateTargetLang(lang.code.name);
-                  }
-                },
-                onSwap: () {
-                  settingsNotifier.swapLanguages();
-                },
               ),
-              const SizedBox(height: 24),
-              rb.RecordButton(
+              const SizedBox(height: 16),
+              _buildLanguageBar(context, settings, sourceLang, targetLang, settingsNotifier),
+              const SizedBox(height: 20),
+              ImmersiveRecordButton(
                 state: buttonState,
                 onPressed: () {
                   final notifier = ref.read(pipelineStateProvider.notifier);
@@ -108,67 +85,185 @@ class HomePage extends ConsumerWidget {
     );
   }
 
-  rb.RecordButtonState _mapState(PipelineState state) {
-    switch (state) {
-      case PipelineState.idle:
-        return rb.RecordButtonState.idle;
-      case PipelineState.listening:
-        return rb.RecordButtonState.recording;
-      case PipelineState.recognizing:
-        return rb.RecordButtonState.recognizing;
-      case PipelineState.translating:
-        return rb.RecordButtonState.recognizing;
-      case PipelineState.speaking:
-        return rb.RecordButtonState.speaking;
-    }
-  }
-}
-
-class _LanguageBar extends StatelessWidget {
-  final LanguageInfo? sourceLang;
-  final LanguageInfo? targetLang;
-  final ValueChanged<LanguageInfo?> onSourceChanged;
-  final ValueChanged<LanguageInfo?> onTargetChanged;
-  final VoidCallback onSwap;
-
-  const _LanguageBar({
-    required this.sourceLang,
-    required this.targetLang,
-    required this.onSourceChanged,
-    required this.onTargetChanged,
-    required this.onSwap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLoc.of(context)!;
-    return Row(
-      children: [
-        Expanded(
-          child: LanguageSelector(
-            value: sourceLang,
-            onChanged: onSourceChanged,
-            label: l.sourceLanguage,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: IconButton.filledTonal(
-            onPressed: onSwap,
-            icon: Transform.rotate(
-              angle: pi / 2,
-              child: const Icon(Icons.compare_arrows_rounded),
+  Widget _buildTopBar(
+    BuildContext context,
+    AppLoc l,
+    WidgetRef ref,
+    OverlayService overlayService,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Text(
+            l.appTitle,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
             ),
           ),
-        ),
-        Expanded(
-          child: LanguageSelector(
-            value: targetLang,
-            onChanged: onTargetChanged,
-            label: l.targetLanguage,
+          const Spacer(),
+          IconButton(
+            icon: Icon(
+              overlayService.isVisible
+                  ? Icons.close_fullscreen
+                  : Icons.picture_in_picture,
+              color: Colors.white70,
+            ),
+            onPressed: () => overlayService.toggle(context, ref),
           ),
-        ),
-      ],
+          IconButton(
+            icon: const Icon(Icons.history_rounded, color: Colors.white70),
+            onPressed: () => context.go('/history'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings_rounded, color: Colors.white70),
+            onPressed: () => context.go('/settings'),
+          ),
+        ],
+      ),
     );
+  }
+
+  Widget _buildLanguageBar(
+    BuildContext context,
+    AppSettings settings,
+    LanguageInfo? sourceLang,
+    LanguageInfo? targetLang,
+    SettingsNotifier notifier,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          LanguagePill(
+            flag: sourceLang?.flag ?? '🌐',
+            name: sourceLang?.name ?? '',
+            onTap: () => _showLanguageSheet(context, settings, true, notifier),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: GestureDetector(
+              onTap: () => notifier.swapLanguages(),
+              child: Transform.rotate(
+                angle: 3.14159 / 2,
+                child: const Icon(
+                  Icons.compare_arrows_rounded,
+                  color: Colors.white54,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+          LanguagePill(
+            flag: targetLang?.flag ?? '🌐',
+            name: targetLang?.name ?? '',
+            onTap: () => _showLanguageSheet(context, settings, false, notifier),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLanguageSheet(
+    BuildContext context,
+    AppSettings settings,
+    bool isSource,
+    SettingsNotifier notifier,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1A1A2E),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    AppLoc.of(context)!.selectLanguage,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                ...AppLanguages.all.map((lang) {
+                  final currentCode = isSource
+                      ? settings.sourceLanguage
+                      : settings.targetLanguage;
+                  final isSelected = lang.code.name == currentCode;
+                  return ListTile(
+                    leading: Text(lang.flag, style: const TextStyle(fontSize: 24)),
+                    title: Text(
+                      lang.nativeName,
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : Colors.white70,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                    subtitle: Text(
+                      lang.name,
+                      style: TextStyle(color: Colors.white.withOpacity(0.4)),
+                    ),
+                    trailing: isSelected
+                        ? const Icon(Icons.check_circle, color: Colors.green)
+                        : null,
+                    onTap: () {
+                      if (isSource) {
+                        notifier.updateSourceLang(lang.code.name);
+                      } else {
+                        notifier.updateTargetLang(lang.code.name);
+                      }
+                      Navigator.pop(ctx);
+                    },
+                  );
+                }),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  PipelineDisplayState _mapState(PipelineState state) {
+    switch (state) {
+      case PipelineState.idle:
+        return PipelineDisplayState.idle;
+      case PipelineState.listening:
+        return PipelineDisplayState.listening;
+      case PipelineState.recognizing:
+        return PipelineDisplayState.recognizing;
+      case PipelineState.translating:
+        return PipelineDisplayState.translating;
+      case PipelineState.speaking:
+        return PipelineDisplayState.speaking;
+    }
+  }
+
+  ImmersiveButtonState _mapButtonState(PipelineState state) {
+    switch (state) {
+      case PipelineState.idle:
+        return ImmersiveButtonState.idle;
+      case PipelineState.listening:
+        return ImmersiveButtonState.recording;
+      case PipelineState.recognizing:
+        return ImmersiveButtonState.recognizing;
+      case PipelineState.translating:
+        return ImmersiveButtonState.recognizing;
+      case PipelineState.speaking:
+        return ImmersiveButtonState.speaking;
+    }
   }
 }

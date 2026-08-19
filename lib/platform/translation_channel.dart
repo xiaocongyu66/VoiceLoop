@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 
+import '../core/constants/languages.dart';
 import '../core/utils/logger.dart';
 
 class TranslationChannel {
@@ -12,11 +13,13 @@ class TranslationChannel {
     String sourceLang,
     String targetLang,
   ) async {
+    final srcTag = AppLanguages.mlKitTag(sourceLang);
+    final tgtTag = AppLanguages.mlKitTag(targetLang);
     try {
       final result = await _channel.invokeMethod<String>('translate', {
         'text': text,
-        'sourceLang': sourceLang,
-        'targetLang': targetLang,
+        'sourceLang': srcTag,
+        'targetLang': tgtTag,
       });
       if (result == null) {
         throw PlatformException(
@@ -32,10 +35,12 @@ class TranslationChannel {
   }
 
   Future<bool> isSupported(String sourceLang, String targetLang) async {
+    final srcTag = AppLanguages.mlKitTag(sourceLang);
+    final tgtTag = AppLanguages.mlKitTag(targetLang);
     try {
       final result = await _channel.invokeMethod<bool>('isSupported', {
-        'sourceLang': sourceLang,
-        'targetLang': targetLang,
+        'sourceLang': srcTag,
+        'targetLang': tgtTag,
       });
       return result ?? false;
     } on PlatformException catch (e) {

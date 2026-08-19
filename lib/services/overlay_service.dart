@@ -65,8 +65,8 @@ class _FloatingTranslationOverlayState
     final targetLang = AppLanguages.byCode(settings.targetLanguage);
 
     return Positioned(
-      left: _position.dx.clamp(0, screen.width - 280),
-      top: _position.dy.clamp(0, screen.height - 200),
+      left: _position.dx,
+      top: _position.dy,
       child: Material(
         color: Colors.transparent,
         child: GestureDetector(

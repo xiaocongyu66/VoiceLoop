@@ -14,6 +14,12 @@ class ModelManager {
   HttpClient? _httpClient;
   bool _cancelRequested = false;
 
+  static const List<String> _mirrorBases = [
+    'https://github.com/k2-fsa/sherpa-onnx/releases/download',
+    'https://hf-mirror.com/k2-fsa/sherpa-onnx/resolve',
+    'https://huggingface.co/k2-fsa/sherpa-onnx/resolve',
+  ];
+
   Future<String> getModelDir() async {
     final docs = await getApplicationDocumentsDirectory();
     final dir = Directory(p.join(docs.path, _modelDirName));
@@ -29,6 +35,11 @@ class ModelManager {
   }
 
   Future<bool> isModelDownloaded(String modelId) async {
+    if (modelId == 'silero-vad') {
+      final modelPath = await getModelPath(modelId);
+      final file = File(p.join(modelPath, 'silero_vad.onnx'));
+      return file.existsSync();
+    }
     final asr = AsrModels.byId(modelId);
     if (asr != null) {
       final modelPath = await getModelPath(modelId);
@@ -51,16 +62,14 @@ class ModelManager {
     _httpClient?.close(force: true);
   }
 
+  bool get isVadModel => _currentModelId == 'silero-vad';
+  String? _currentModelId;
+
   Future<void> downloadModel(
     String modelId, {
     void Function(double progress)? onProgress,
   }) async {
-    final asr = AsrModels.byId(modelId);
-    final tts = TtsModels.byId(modelId);
-    if (asr == null && tts == null) {
-      throw ArgumentError('Unknown model id: $modelId');
-    }
-
+    _currentModelId = modelId;
     _cancelRequested = false;
 
     final alreadyDownloaded = await isModelDownloaded(modelId);
@@ -69,7 +78,20 @@ class ModelManager {
       return;
     }
 
-    final downloadUrl = asr?.downloadUrl ?? tts!.downloadUrl;
+    if (modelId == 'silero-vad') {
+      await _downloadVadModel(onProgress);
+      return;
+    }
+
+    final asr = AsrModels.byId(modelId);
+    final tts = TtsModels.byId(modelId);
+    if (asr == null && tts == null) {
+      throw ArgumentError('Unknown model id: $modelId');
+    }
+
+    final relativePath = asr != null
+        ? 'asr-models/${asr.downloadUrl.split('/').last}'
+        : 'tts-models/${tts!.downloadUrl.split('/').last}';
 
     final tempDir = await getTemporaryDirectory();
     final tarBz2Path = p.join(tempDir.path, '$modelId.tar.bz2');
@@ -80,54 +102,27 @@ class ModelManager {
     }
     await extractDir.create(recursive: true);
 
-    _httpClient = HttpClient();
-    try {
-      final request = await _httpClient!.getUrl(Uri.parse(downloadUrl));
-      final response = await request.close();
-
-      if (response.statusCode != HttpStatus.ok) {
-        throw HttpException(
-          'Download failed: HTTP ${response.statusCode}',
-        );
-      }
-
-      final total = response.contentLength;
-      var received = 0;
-
-      final sink = tarBz2File.openWrite();
+    Exception? lastError;
+    for (final mirror in _mirrorBases) {
+      final url = '$mirror/$relativePath';
       try {
-        await for (final chunk in response) {
-          if (_cancelRequested) {
-            await sink.flush();
-            await sink.close();
-            await tarBz2File.delete();
-            throw CancellationException();
-          }
-          sink.add(chunk);
-          received += chunk.length;
-          if (total > 0) {
-            onProgress?.call(received / total);
-          }
-        }
-        await sink.flush();
-        await sink.close();
+        await _downloadWithRetry(url, tarBz2File, onProgress);
+        lastError = null;
+        break;
       } catch (e) {
-        await sink.close();
-        rethrow;
+        lastError = e is Exception ? e : Exception(e.toString());
+        if (_cancelRequested) {
+          if (tarBz2File.existsSync()) await tarBz2File.delete();
+          throw CancellationException();
+        }
       }
-    } finally {
-      _httpClient?.close();
-      _httpClient = null;
+    }
+    if (lastError != null) {
+      if (tarBz2File.existsSync()) await tarBz2File.delete();
+      throw lastError;
     }
 
     onProgress?.call(1.0);
-
-    if (_cancelRequested) {
-      if (tarBz2File.existsSync()) {
-        await tarBz2File.delete();
-      }
-      throw CancellationException();
-    }
 
     if (!tarBz2File.existsSync()) {
       throw FileSystemException('Downloaded file not found', tarBz2Path);
@@ -189,12 +184,119 @@ class ModelManager {
     }
   }
 
+  Future<void> _downloadVadModel(
+    void Function(double progress)? onProgress,
+  ) async {
+    final modelDir = Directory(await getModelPath('silero-vad'));
+    if (!modelDir.existsSync()) {
+      await modelDir.create(recursive: true);
+    }
+    final destFile = File(p.join(modelDir.path, 'silero_vad.onnx'));
+
+    final urls = [
+      'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx',
+      'https://hf-mirror.com/k2-fsa/sherpa-onnx/resolve/asr-models/silero_vad.onnx',
+      'https://huggingface.co/k2-fsa/sherpa-onnx/resolve/asr-models/silero_vad.onnx',
+    ];
+
+    Exception? lastError;
+    for (final url in urls) {
+      try {
+        await _downloadWithRetry(url, destFile, onProgress);
+        lastError = null;
+        break;
+      } catch (e) {
+        lastError = e is Exception ? e : Exception(e.toString());
+        if (_cancelRequested) {
+          if (destFile.existsSync()) await destFile.delete();
+          throw CancellationException();
+        }
+      }
+    }
+    if (lastError != null) {
+      if (destFile.existsSync()) await destFile.delete();
+      throw lastError;
+    }
+    onProgress?.call(1.0);
+  }
+
+  Future<void> _downloadWithRetry(
+    String url,
+    File destFile,
+    void Function(double progress)? onProgress, {
+    int maxRetries = 3,
+  }) async {
+    Exception? lastError;
+    for (int attempt = 0; attempt < maxRetries; attempt++) {
+      if (_cancelRequested) throw CancellationException();
+      try {
+        final existingLen = destFile.existsSync() ? destFile.lengthSync() : 0;
+        _httpClient = HttpClient();
+        _httpClient!.connectionTimeout = const Duration(seconds: 30);
+        _httpClient!.idleTimeout = const Duration(seconds: 60);
+
+        final request = await _httpClient!.getUrl(Uri.parse(url));
+        if (existingLen > 0) {
+          request.headers.set(HttpHeaders.rangeHeader, 'bytes=$existingLen-');
+        }
+
+        final response = await request.close();
+
+        final statusCode = response.statusCode;
+        if (statusCode != HttpStatus.ok &&
+            statusCode != HttpStatus.partialContent) {
+          throw HttpException('HTTP $statusCode for $url');
+        }
+
+        final total = response.contentLength > 0
+            ? response.contentLength + existingLen
+            : 0;
+        var received = existingLen;
+
+        final sink = destFile.openWrite(mode: FileMode.append);
+        try {
+          await for (final chunk in response) {
+            if (_cancelRequested) {
+              await sink.flush();
+              await sink.close();
+              throw CancellationException();
+            }
+            sink.add(chunk);
+            received += chunk.length;
+            if (total > 0) {
+              onProgress?.call(received / total);
+            }
+          }
+          await sink.flush();
+          await sink.close();
+        } catch (e) {
+          await sink.close();
+          rethrow;
+        } finally {
+          _httpClient?.close();
+          _httpClient = null;
+        }
+        return;
+      } catch (e) {
+        lastError = e is Exception ? e : Exception(e.toString());
+        if (e is CancellationException) rethrow;
+        await Future.delayed(Duration(seconds: 1 << attempt));
+      }
+    }
+    throw lastError ?? Exception('Download failed');
+  }
+
   Future<void> deleteModel(String modelId) async {
     final modelPath = await getModelPath(modelId);
     final dir = Directory(modelPath);
     if (dir.existsSync()) {
       await dir.delete(recursive: true);
     }
+  }
+
+  Future<String> getVadModelPath() async {
+    final modelPath = await getModelPath('silero-vad');
+    return p.join(modelPath, 'silero_vad.onnx');
   }
 }
 
