@@ -36,11 +36,19 @@ class PipelineStateNotifier extends StateNotifier<PipelineState> {
     if (_pipeline != null) return _pipeline!;
     _pipeline = AudioPipeline(audioIsolate: _ref.read(audioIsolateProvider));
     _stateSub = _pipeline!.stateStream.listen((s) {
-      if (mounted) state = s;
+      if (mounted) {
+        state = s;
+        try {
+          SystemOverlayChannel().updateState(s.name);
+        } catch (_) {}
+      }
     });
     _partialSub = _pipeline!.partialTextStream.listen((text) {
       if (mounted) {
         _ref.read(partialTextProvider.notifier).state = text;
+        try {
+          SystemOverlayChannel().updateText(text, '');
+        } catch (_) {}
       }
     });
     _translationSub = _pipeline!.translationStream.listen((result) {

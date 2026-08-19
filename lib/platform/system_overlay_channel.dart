@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import '../core/utils/logger.dart';
 
 class SystemOverlayChannel {
-  static const MethodChannel _channel = MethodChannel('com.voiceloop.system_overlay');
+  static const MethodChannel _channel =
+      MethodChannel('com.voiceloop.system_overlay');
 
   Future<bool> hasPermission() async {
     try {
@@ -49,6 +50,17 @@ class SystemOverlayChannel {
       }) ?? false;
     } catch (e) {
       Logger.e('Update overlay text failed: $e');
+      return false;
+    }
+  }
+
+  Future<bool> updateState(String state) async {
+    try {
+      return await _channel.invokeMethod<bool>('updateOverlayState', {
+        'state': state,
+      }) ?? false;
+    } catch (e) {
+      Logger.e('Update overlay state failed: $e');
       return false;
     }
   }

@@ -8,7 +8,6 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <application
         android:label="voice_loop"
         android:name="${applicationName}"
@@ -47,7 +46,6 @@
             android:exported="false" />
         <service
             android:name=".SystemOverlayService"
-            android:foregroundServiceType="specialUse"
             android:exported="false" />
     </application>
     <!-- Required to query activities that can process text, see:
