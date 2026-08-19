@@ -6,6 +6,7 @@ import 'package:path/path.dart' as p;
 import '../models/asr_model_info.dart';
 import '../models/translation_result.dart';
 import '../models/tts_model_info.dart';
+import '../platform/system_overlay_channel.dart';
 import '../services/audio_pipeline.dart';
 import 'service_provider.dart';
 import 'settings_provider.dart';
@@ -45,6 +46,10 @@ class PipelineStateNotifier extends StateNotifier<PipelineState> {
     _translationSub = _pipeline!.translationStream.listen((result) {
       if (mounted) {
         _ref.read(lastTranslationProvider.notifier).state = result;
+        try {
+          final channel = SystemOverlayChannel();
+          channel.updateText(result.originalText, result.translatedText);
+        } catch (_) {}
       }
     });
     _errorSub = _pipeline!.errorStream.listen((error) {

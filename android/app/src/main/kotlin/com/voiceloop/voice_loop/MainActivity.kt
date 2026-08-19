@@ -17,5 +17,10 @@ class MainActivity : FlutterActivity() {
         } catch (e: Exception) {
             Log.e("MainActivity", "Failed to add SystemAudioPlugin", e)
         }
+        try {
+            flutterEngine.plugins.add(SystemOverlayPlugin())
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Failed to add SystemOverlayPlugin", e)
+        }
     }
 }

@@ -5,15 +5,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/constants/languages.dart';
 import '../l10n/app_localizations.dart';
+import '../models/translation_result.dart';
 import '../providers/pipeline_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/translation_widgets.dart';
-import '../models/translation_result.dart';
 
 final overlayVisibleProvider =
     StateNotifierProvider<OverlayVisibleNotifier, bool>(
-      (ref) => OverlayVisibleNotifier(),
-    );
+  (ref) => OverlayVisibleNotifier(),
+);
 
 class OverlayVisibleNotifier extends StateNotifier<bool> {
   OverlayVisibleNotifier() : super(false);
@@ -33,7 +33,7 @@ class OverlayManager extends ConsumerWidget {
     return Stack(
       children: [
         child,
-        if (visible) const Positioned.fill(child: _FloatingOverlay()),
+        if (visible) const _FloatingOverlay(),
       ],
     );
   }
@@ -58,73 +58,73 @@ class _FloatingOverlayState extends ConsumerState<_FloatingOverlay> {
     final partialText = ref.watch(partialTextProvider);
     final lastTranslation = ref.watch(lastTranslationProvider);
     final screen = MediaQuery.of(context).size;
+    final padding = MediaQuery.of(context).padding;
 
     final sourceLang = AppLanguages.byCode(settings.sourceLanguage);
     final targetLang = AppLanguages.byCode(settings.targetLanguage);
 
+    final overlayWidth = _expanded ? 284.0 : 48.0;
+    final overlayHeight = _expanded ? 260.0 : 48.0;
+
+    final maxX = screen.width - overlayWidth - 8;
+    final maxY = screen.height - overlayHeight - padding.vertical - 8;
+
     return Positioned(
-      left: _position.dx.clamp(8, screen.width - 300),
-      top: _position.dy.clamp(8, screen.height - 260),
-      child: GestureDetector(
-        onPanUpdate: (d) {
-          setState(() {
-            _position = Offset(
-              (_position.dx + d.delta.dx).clamp(8, screen.width - 300),
-              (_position.dy + d.delta.dy).clamp(8, screen.height - 260),
-            );
-          });
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          width: _expanded ? 284 : 48,
-          constraints: const BoxConstraints(maxHeight: 260),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1C1C1E).withOpacity(0.88),
-            borderRadius: BorderRadius.circular(22),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.5),
-                blurRadius: 20,
-                spreadRadius: 1,
-                offset: const Offset(0, 8),
-              ),
-            ],
-            border: Border.all(
-              color: Colors.white.withOpacity(0.06),
-              width: 0.5,
+      left: _position.dx.clamp(8, maxX > 8 ? maxX : 8),
+      top: _position.dy.clamp(padding.top + 8, maxY > padding.top + 8 ? maxY : padding.top + 8),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: overlayWidth,
+        constraints: BoxConstraints(maxHeight: overlayHeight),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1C1C1E).withOpacity(0.90),
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.5),
+              blurRadius: 20,
+              spreadRadius: 1,
+              offset: const Offset(0, 8),
             ),
+          ],
+          border: Border.all(
+            color: Colors.white.withOpacity(0.06),
+            width: 0.5,
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(22),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildHeader(
-                    context,
-                    l,
-                    pipelineState,
-                    sourceLang,
-                    targetLang,
-                  ),
-                  if (_expanded)
-                    Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.all(14),
-                        child: _buildContent(
-                          context,
-                          l,
-                          lastTranslation,
-                          partialText,
-                          sourceLang,
-                          targetLang,
-                          pipelineState,
-                        ),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildDragHandle(
+                  context,
+                  l,
+                  pipelineState,
+                  sourceLang,
+                  targetLang,
+                  maxX,
+                  maxY,
+                  padding,
+                ),
+                if (_expanded)
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: _buildContent(
+                        context,
+                        l,
+                        lastTranslation,
+                        partialText,
+                        sourceLang,
+                        targetLang,
+                        pipelineState,
                       ),
                     ),
-                ],
-              ),
+                  ),
+              ],
             ),
           ),
         ),
@@ -132,66 +132,79 @@ class _FloatingOverlayState extends ConsumerState<_FloatingOverlay> {
     );
   }
 
-  Widget _buildHeader(
+  Widget _buildDragHandle(
     BuildContext context,
     AppLoc l,
     PipelineState state,
     LanguageInfo? sourceLang,
     LanguageInfo? targetLang,
+    double maxX,
+    double maxY,
+    EdgeInsets padding,
   ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.04),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
-      ),
-      child: Row(
-        children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: _stateColor(state),
-            ),
-          ),
-          const SizedBox(width: 8),
-          if (_expanded) ...[
-            Expanded(
-              child: Text(
-                _stateText(state, l),
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.65),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onPanUpdate: (d) {
+        setState(() {
+          _position = Offset(
+            (_position.dx + d.delta.dx).clamp(8, maxX > 8 ? maxX : 8),
+            (_position.dy + d.delta.dy)
+                .clamp(padding.top + 8, maxY > padding.top + 8 ? maxY : padding.top + 8),
+          );
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.04),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+        ),
+        child: Row(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _stateColor(state),
               ),
             ),
-            Text(
-              '${sourceLang?.flag ?? ''} → ${targetLang?.flag ?? ''}',
-              style: const TextStyle(fontSize: 12, color: Colors.white54),
-            ),
             const SizedBox(width: 8),
-          ],
-          GestureDetector(
-            onTap: () => setState(() => _expanded = !_expanded),
-            child: Icon(
-              _expanded ? Icons.expand_more_rounded : Icons.expand_less_rounded,
+            if (_expanded) ...[
+              Expanded(
+                child: Text(
+                  _stateText(state, l),
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.65),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              Text(
+                '${sourceLang?.flag ?? ''} → ${targetLang?.flag ?? ''}',
+                style: const TextStyle(fontSize: 12, color: Colors.white54),
+              ),
+              const SizedBox(width: 8),
+            ],
+            _IconButton(
+              icon: _expanded
+                  ? Icons.expand_more_rounded
+                  : Icons.expand_less_rounded,
               size: 18,
               color: Colors.white38,
+              onTap: () => setState(() => _expanded = !_expanded),
             ),
-          ),
-          const SizedBox(width: 4),
-          GestureDetector(
-            onTap: () => ref.read(overlayVisibleProvider.notifier).hide(),
-            child: const Icon(
-              Icons.close_rounded,
+            const SizedBox(width: 4),
+            _IconButton(
+              icon: Icons.close_rounded,
               size: 16,
               color: Colors.white38,
+              onTap: () => ref.read(overlayVisibleProvider.notifier).hide(),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -286,6 +299,35 @@ class _FloatingOverlayState extends ConsumerState<_FloatingOverlay> {
       PipelineState.translating => l.translating,
       PipelineState.speaking => l.speaking,
     };
+  }
+}
+
+class _IconButton extends StatelessWidget {
+  final IconData icon;
+  final double size;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _IconButton({
+    required this.icon,
+    required this.size,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Icon(icon, size: size, color: color),
+        ),
+      ),
+    );
   }
 }
 
