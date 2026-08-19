@@ -22,5 +22,10 @@ class MainActivity : FlutterActivity() {
         } catch (e: Exception) {
             Log.e("MainActivity", "Failed to add SystemOverlayPlugin", e)
         }
+        try {
+            flutterEngine.plugins.add(ModelExtractPlugin())
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Failed to add ModelExtractPlugin", e)
+        }
     }
 }
