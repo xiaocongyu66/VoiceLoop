@@ -80,7 +80,20 @@ class PipelineStateNotifier extends StateNotifier<PipelineState> {
       final asrService = _ref.read(asrServiceProvider);
       final modelPath = p.join(modelDir, asrModel.modelFileName);
       final tokensPath = p.join(modelDir, asrModel.tokensFileName);
-      asrService.init(modelPath, tokensPath, language: sourceLang);
+
+      String? vadModelPath;
+      final vadReady = await modelManager.isModelDownloaded('silero-vad');
+      if (vadReady) {
+        vadModelPath = await modelManager.getVadModelPath();
+      }
+
+      state = PipelineState.recognizing;
+      await asrService.init(
+        modelPath,
+        tokensPath,
+        language: sourceLang,
+        vadModelPath: vadModelPath,
+      );
     }
 
     final ttsModelId = settings.ttsModelId;

@@ -123,7 +123,7 @@ class AudioPipeline {
 
     String text = '';
     try {
-      text = asrService.recognize(speech);
+      text = await asrService.recognize(speech);
     } catch (e) {
       _errorController.add('recognitionFailed');
       _setState(PipelineState.listening);
